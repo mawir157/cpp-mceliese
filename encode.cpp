@@ -5,11 +5,9 @@
 void prepend_identity(matrix& rows)
 {
     code_word prefix = (1 << (2*rows.size() - 1));
-    for (size_t i = 0;  i < rows.size(); ++i)
-    {
+    for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
         rows[i] += prefix;
-        prefix >>= 1;
-    }
+
     return;
 }
 
@@ -17,11 +15,10 @@ void append_identity(matrix& rows)
 {
     unsigned int shift = rows.size() - 1;
     code_word prefix = (1 << shift);
-    for (size_t i = 0;  i < rows.size(); ++i)
+    for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
     {
         rows[i] <<= (shift + 1);
         rows[i] += prefix;
-        prefix >>= 1;
     }
     return;
 }
@@ -42,10 +39,9 @@ code_word encode_symbol(const code_word r, const matrix& linear_code)
     code_word plain = r;
     code_word cipher = 0;
     for (size_t i = 0; i < linear_code.size(); ++i, plain >>= 1)
-    {
         if (1 == (plain & 1))
             cipher = row_add(cipher, linear_code[i]);
-    }
+
     return cipher;
 }
 
@@ -148,9 +144,6 @@ syndrome_table build_syn_table(const matrix& check_matrix,
     {
         const code_word err = errors[i];
         const code_word check = check_symbol(err, check_matrix);
-        
-        if (0 == check)
-            std::cout << "something has gone wrong" << std::endl;
 
         s_table[check] = err;
     }
@@ -171,7 +164,7 @@ void print_syn_table(syndrome_table& st, const unsigned int n_bits)
 }
 
 code_word add_upto_n_error(const code_word& wd, const unsigned int width,
-                      const unsigned int n = 1)
+                           const unsigned int n = 1)
 {
     code_word new_word = wd;
     for (size_t i = 0; i < n; ++i)
@@ -181,4 +174,3 @@ code_word add_upto_n_error(const code_word& wd, const unsigned int width,
     }
     return new_word;
 }
-

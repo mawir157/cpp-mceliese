@@ -31,7 +31,6 @@ unsigned int col_weight(const matrix& rows, const size_t c1)
     return total;
 }
 
-
 std::vector<unsigned int> column_weights(const matrix& rows)
 {
     std::vector<unsigned int> cols(rows.size());
@@ -66,9 +65,8 @@ void print_codeword(code_word r, const size_t n, const bool new_line)
         r >>= 1;
     }
     for (size_t i = 1; i <= n; ++i)
-    {
         std::cout << bin[n - i];
-    }
+
     if (new_line)
         std::cout << std::endl;
 
@@ -80,30 +78,8 @@ void print_matrix(const matrix rows, size_t n)
     if (n == 0)
         n = rows.size();
 
-    std::vector<unsigned int> wts;
-
     for (size_t i = 0; i < rows.size(); ++i)
-    {
         print_codeword(rows[i], n);
-        wts.push_back(row_weight(rows[i]));
-    }
-
-    // std::sort(wts.begin(), wts.end());
-    // std::cout << "(";
-    // for (size_t i = 0; i < wts.size(); ++i)
-    // {
-    //     std::cout << wts[i];
-    //     std::cout << ((wts.size() == i + 1) ? ")\n" : ",");
-    // }
-
-    // std::vector<unsigned int> cols = column_weights(rows);
-    // std::sort(cols.begin(), cols.end());
-    // std::cout << "(";
-    // for (size_t i = 0; i < cols.size(); ++i)
-    // {
-    //     std::cout << cols[i];
-    //     std::cout << ((cols.size() == i + 1) ? ")\n" : ",");
-    // }
 
     std::cout << std::endl;
 
@@ -125,20 +101,11 @@ bool order_by_weight(const code_word r1, const code_word r2)
 
 code_word swap_bits(const code_word r, const size_t c1, const size_t c2)
 {
-    /* Move p1'th to rightmost side */
-    code_word b1 =  (r >> c1) & 1; 
-  
-    /* Move p2'th to rightmost side */
-    code_word b2 =  (r >> c2) & 1; 
-  
-    /* XOR the two bits */
+    const code_word b1 =  (r >> c1) & 1; 
+    const code_word b2 =  (r >> c2) & 1; 
     code_word x = (b1 ^ b2); 
-  
-    /* Put the xor bit back to their original positions */
     x = (x << c1) | (x << c2); 
-  
-    /* XOR 'x' with the original number so that the 
-       two sets are swapped */
+
     return (r ^ x); 
 }
 
@@ -152,10 +119,7 @@ void swap_columns(matrix& m, std::vector<unsigned int>& count,
                   const size_t c1, const size_t c2)
 {
     for (size_t j=0; j < m.size(); ++j)
-    {
-        const code_word r = m[j];
-        m[j] = swap_bits(r, c1, c2);
-    }
+        m[j] = swap_bits(m[j], c1, c2);
 
     std::iter_swap(count.begin() + c1, count.begin() + c2);
 
@@ -216,6 +180,7 @@ void recursively_build(matrix rows,
     {
         if (0 == (row_weight(rw) & 1))
             continue;
+
         bool ok = true;
         for (size_t i = 0; i < rows.size(); ++i)
         {
@@ -252,10 +217,8 @@ std::vector<matrix> all(const unsigned int n, const bool verbose)
             std::cout << std::endl;
         }
 
-        mask <<= 1;
-        mask += 1;
-        mask <<= 1;
-        mask += 1;
+        mask <<= 2;
+        mask += 3;
 
         matrix test = {seed}; 
         recursively_build(test, n-1, max, matrices, verbose);
