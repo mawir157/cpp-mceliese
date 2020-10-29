@@ -1,6 +1,7 @@
 #include "includes.h"
-#include "linearcode.h"
+#include "matrix.h"
 #include "encode.h"
+#include "linearcode.h"
 
 int main (int argc, char **argv)
 {
@@ -31,47 +32,28 @@ int main (int argc, char **argv)
     for (size_t i = 0; i < 100; ++i)
         message.push_back(rand() % (1 << n_bits));
 
-    std::tuple<matrix, matrix> gc = gen_check_matrices(mats[best_i]);
+    LinearCode lc = LinearCode(mats[best_i], n_bits);
+    lc.print();
 
-    const matrix linear_code = std::get<0>(gc);
-    const matrix check_matrix = std::get<1>(gc);
-
-    std::cout << "Code we are testing:" << std::endl;
-    std::cout << "Generating matrix:" << std::endl;
-    print_matrix(linear_code, 2*n_bits);
-    std::cout << "Checking matrix:" << std::endl;
-    print_matrix(check_matrix, 2*n_bits);
-
-    unsigned int max_errors = (minimum_weight(linear_code) / 2) - 1;
-    std::cout << "Minimum weight = " << minimum_weight(linear_code) << std::endl;
-    std:: cout << "Maximum errors = " << max_errors << std::endl;
-
-    std::vector<code_word> ciphertext =
-                               encode_message(message, linear_code);
+    std::vector<code_word> ciphertext = lc.encode_message(message);
 
     // add errors to the cipher text
     std::vector<code_word> errortext;
     for (size_t i = 0; i < ciphertext.size(); ++i)
-        errortext.push_back(add_upto_n_error(ciphertext[i], 2*n_bits, max_errors));
+        errortext.push_back(add_upto_n_error(ciphertext[i],
+                                             2*lc.get_code_with(),
+                                             lc.get_max_error()));
 
-    std::vector<code_word> checktext2 = check_message(errortext, check_matrix);
-
-    syndrome_table st = build_syn_table(check_matrix, max_errors);
-    std::cout << "Syndrome table" << std::endl;
-    print_syn_table(st, n_bits);
-
-    std::vector<code_word> plaintext1 =  
-                                   decode_message(ciphertext, check_matrix, st);     
-    std::vector<code_word> plaintext2 =  
-                                   decode_message(errortext, check_matrix, st); 
+    std::vector<code_word> plaintext1 = lc.decode_message(ciphertext);
+    std::vector<code_word> plaintext2 = lc.decode_message(errortext);
     
     for (size_t i = 0; i < plaintext1.size(); ++i)
     {
         if (plaintext1[i] != plaintext2[i])
         {
-            print_codeword(plaintext1[i], linear_code.size(), false);
+            print_codeword(plaintext1[i], lc.get_code_with(), false);
             std::cout << " -> ";
-            print_codeword(plaintext2[i], linear_code.size());
+            print_codeword(plaintext2[i], lc.get_code_with());
         }
     }
 

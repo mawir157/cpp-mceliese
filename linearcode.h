@@ -1,29 +1,37 @@
 #pragma once
 
-#include "includes.h"
+#include "matrix.h"
+#include "encode.h"
 
-typedef uint64_t code_word;
-typedef std::vector<code_word> matrix;
+class LinearCode
+{
+	public:
+		LinearCode(const matrix& M, const size_t mn_code_width);
+		~LinearCode();
 
-inline bool operator==(const matrix& lhs, const matrix& rhs);
-unsigned int row_dot(const code_word r1, const code_word r2);
-code_word row_add(const code_word r1, const code_word r2);
+		// getters
+		matrix get_gen_mat()   const { return mv_generator; }
+		matrix get_check_mat() const { return mv_check; }
+		size_t get_code_with() const { return mn_code_width; }
+		size_t get_max_error() const { return mn_max_errors; }
 
-unsigned int col_weight(const matrix& rows, const size_t c1);
-std::vector<unsigned int> column_weights(const matrix& rows);
-unsigned int row_weight(code_word r);
+		// [en/de]-crypting
+		std::vector<code_word> encode_message(const std::vector<code_word>& message);
+		std::vector<code_word> decode_message(const std::vector<code_word>& message);
 
-void print_codeword(code_word r, const size_t n, const bool new_line=true);
-void print_matrix(const matrix rows, size_t n=0);
+		// printing code
+		void print();
+	
+	private:
+		matrix mv_generator;
+		matrix mv_check;
+		syndrome_table mm_syndromes;
+		size_t mn_code_width; // a '4 bit -> 8 bit' code has mn_code_width = 4;
+		size_t mn_max_errors;
 
-bool order_by_weight(const code_word r1, const code_word r2);
-code_word swap_bits(const code_word r, const size_t c1, const size_t c2);
-code_word flip_bit(const code_word r, const size_t c1);
-void swap_columns(matrix& m, const size_t c1, const size_t c2);
-void order_columns(matrix& m);
-matrix transpose(const matrix& m);
+		// [en/de]-crypting
+		code_word encode_symbol(const code_word r);
+		code_word decode_symbol(const code_word r);
 
-void recursively_build(matrix rows, unsigned int depth, const code_word max_row,
-                       std::vector<matrix>& matrices, const bool verbose=false);
-
-std::vector<matrix> all(const unsigned int n, const bool verbose=false);
+		unsigned int calc_minimum_weight();
+};

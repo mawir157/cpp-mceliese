@@ -1,5 +1,3 @@
-// #include "includes.h"
-// #include "linearcode.h"
 #include "encode.h"
 
 void prepend_identity(matrix& rows)
@@ -23,38 +21,6 @@ void append_identity(matrix& rows)
     return;
 }
 
-std::tuple<matrix, matrix> gen_check_matrices(const matrix& mat)
-{
-    matrix gen = mat;
-    prepend_identity(gen);
-    matrix check = transpose(mat);
-    append_identity(check);
-
-    std::tuple<matrix, matrix> gc (gen, check);
-    return gc;
-}
-
-code_word encode_symbol(const code_word r, const matrix& linear_code)
-{
-    code_word plain = r;
-    code_word cipher = 0;
-    for (size_t i = 0; i < linear_code.size(); ++i, plain >>= 1)
-        if (1 == (plain & 1))
-            cipher = row_add(cipher, linear_code[i]);
-
-    return cipher;
-}
-
-std::vector<code_word> encode_message(const std::vector<code_word>& message,
-                                      const matrix& linear_code)
-{
-    std::vector<code_word> ciphertext;
-    for (size_t i = 0; i <  message.size(); ++i)
-        ciphertext.push_back(encode_symbol(message[i], linear_code));
-
-    return ciphertext;
-}
-
 code_word check_symbol(const code_word r, const matrix& check_code)
 {
     code_word cipher = r;
@@ -76,45 +42,6 @@ std::vector<code_word> check_message(const std::vector<code_word>& message,
         checktext.push_back(check_symbol(message[i], check_code));
 
     return checktext;
-}
-
-code_word decode_symbol(const code_word r, const matrix& check_code, 
-                        syndrome_table& stable)
-{
-    const unsigned int n_bits = check_code.size();
-    code_word check = check_symbol(r, check_code);
-    if (0 == check)
-        return (r >> n_bits);
-
-    code_word syndrome = stable[check];
-    code_word temp = row_add(r, syndrome);
-
-    return (temp >> n_bits);
-}
-
-std::vector<code_word> decode_message(const std::vector<code_word>& message,
-                                      const matrix& check_code,
-                                      syndrome_table& stable)
-{
-    std::vector<code_word> plaintext;
-    for (size_t i = 0; i <  message.size(); ++i)
-        plaintext.push_back(decode_symbol(message[i], check_code, stable));
-
-    return plaintext;
-}
-
-unsigned int minimum_weight(const matrix& linear_code)
-{
-    const size_t max_word = 1 << linear_code.size();
-    unsigned int min_wt = 1000;
-    for (code_word wd = 1; wd < max_word; ++wd)
-    {
-        const code_word test = encode_symbol(wd, linear_code);
-        const unsigned int test_wt = row_weight(test);
-        if (test_wt < min_wt)
-            min_wt = test_wt;
-    }
-    return min_wt;
 }
 
 // this is horribly inefficient - can redo in a clever way
