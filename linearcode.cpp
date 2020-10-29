@@ -115,13 +115,10 @@ code_word flip_bit(const code_word r, const size_t c1)
     return (r ^ x); 
 }
 
-void swap_columns(matrix& m, std::vector<unsigned int>& count,
-                  const size_t c1, const size_t c2)
+void swap_columns(matrix& m, const size_t c1, const size_t c2)
 {
     for (size_t j=0; j < m.size(); ++j)
         m[j] = swap_bits(m[j], c1, c2);
-
-    std::iter_swap(count.begin() + c1, count.begin() + c2);
 
     return;
 }
@@ -135,7 +132,9 @@ void order_columns(matrix& m)
         {
             if (col_wts[j-1] < col_wts[j])
             {
-                swap_columns(m, col_wts, j-1, j);
+                swap_columns(m, j-1, j);
+
+                std::iter_swap(col_wts.begin() + (j-1), col_wts.begin() + j);
             }
         }
     }

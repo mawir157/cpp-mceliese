@@ -19,8 +19,7 @@ void print_matrix(const matrix rows, size_t n=0);
 bool order_by_weight(const code_word r1, const code_word r2);
 code_word swap_bits(const code_word r, const size_t c1, const size_t c2);
 code_word flip_bit(const code_word r, const size_t c1);
-void swap_columns(matrix& m, std::vector<unsigned int>& count,
-                  const size_t c1, const size_t c2);
+void swap_columns(matrix& m, const size_t c1, const size_t c2);
 void order_columns(matrix& m);
 matrix transpose(const matrix& m);
 
