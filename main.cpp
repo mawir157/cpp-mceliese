@@ -13,72 +13,57 @@ int main (int argc, char **argv)
         std::cout << "invalid options" << std::endl;
         return -1;
     }
-    unsigned int n_bits = std::stoi(argv[1]);
+    uint64_t n_bits = std::stoi(argv[1]);
 
-    clock_t startTime = clock();
+    // clock_t startTime = clock();
 
-    std::vector<matrix> mats = all(n_bits, false);
+    // std::vector<matrix> mats = all(n_bits, false);
 
-    sort( mats.begin(), mats.end() );
-    mats.erase( unique( mats.begin(), mats.end() ), mats.end() );
-    const size_t best_i = rand() % mats.size();
-    std::cout << "Found " << mats.size() << " self dual codes of length " 
-              << (2*n_bits) << std::endl;
+    // sort( mats.begin(), mats.end() );
+    // mats.erase( unique( mats.begin(), mats.end() ), mats.end() );
+    // const uint64_t best_i = rand() % mats.size();
+    // std::cout << "Found " << mats.size() << " self dual codes of length " 
+    //           << (2*n_bits) << std::endl;
 
-    std::cout << "Time to run: "
-              << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
-              << " seconds." << std::endl;
+    // std::cout << "Time to run: "
+    //           << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
+    //           << " seconds." << std::endl;
+
+    // LinearCode lc = LinearCode(mats[best_i], n_bits);
+    // lc.print();
+
+    n_bits = 24;
+    uint64_t n_words = 4;
+    matrix bs = find(n_words, n_bits);
 
     std::vector<code_word> message;
-    for (size_t i = 0; i < 100; ++i)
-        message.push_back(rand() % (1 << n_bits));
+    for (uint64_t i = 0; i < 100; ++i)
+        message.push_back(rand() % (1 << n_words));
 
-    LinearCode lc = LinearCode(mats[best_i], n_bits);
+    LinearCode lc = LinearCode(bs, n_bits);
     lc.print();
 
     std::vector<code_word> ciphertext = lc.encode_message(message);
 
     // add errors to the cipher text
     std::vector<code_word> errortext;
-    for (size_t i = 0; i < ciphertext.size(); ++i)
+    for (uint64_t i = 0; i < ciphertext.size(); ++i)
         errortext.push_back(add_upto_n_error(ciphertext[i],
-                                             2*lc.get_code_with(),
+                                             n_words + lc.get_code_with(),
                                              lc.get_max_error()));
 
     std::vector<code_word> plaintext1 = lc.decode_message(ciphertext);
     std::vector<code_word> plaintext2 = lc.decode_message(errortext);
     
-    for (size_t i = 0; i < plaintext1.size(); ++i)
+    for (uint64_t i = 0; i < plaintext1.size(); ++i)
     {
         if (plaintext1[i] != plaintext2[i])
         {
-            print_codeword(plaintext1[i], lc.get_code_with(), false);
+            print_codeword(plaintext1[i], n_words, false);
             std::cout << " -> ";
-            print_codeword(plaintext2[i], lc.get_code_with());
+            print_codeword(plaintext2[i], n_words);
         }
     }
-
-    // return 0;
-
-    // permn test_perm = RandomPermutation(2*lc.get_code_with(), 10);
-    // PrintPermutation(test_perm);
-
-    // LinearCode lc2 = lc;
-    // applyPermn(lc2, test_perm);
-    // lc2.print();
-
-    // applyPermn(lc2, test_perm, true);
-    // lc2.print();
-
-    const size_t bitss = 15;
-    matrix bs = find(8, bitss);
-    print_matrix(bs, bitss);
-    for (size_t i = 0; i < bs.size(); ++i)
-        std::cout << bs[i] << ",";
-    std::cout << std::endl;
-
-    LinearCode tc = LinearCode(bs, bitss);
-    tc.print();
 
     return 0;
 }

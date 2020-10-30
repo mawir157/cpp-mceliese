@@ -1,19 +1,19 @@
 #include "encode.h"
 
-void prepend_identity(matrix& rows, const unsigned int n_bits)
+void prepend_identity(matrix& rows, const uint64_t n_bits)
 {
     code_word prefix = (1 << (rows.size() + n_bits - 1));
-    for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
+    for (uint64_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
         rows[i] += prefix;
 
     return;
 }
 
-void append_identity(matrix& rows, const unsigned int n_bits)
+void append_identity(matrix& rows, const uint64_t n_bits)
 {
-    unsigned int shift = n_bits - 1;
+    uint64_t shift = n_bits - 1;
     code_word prefix = (1 << shift);
-    for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
+    for (uint64_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
     {
         rows[i] <<= (shift + 1);
         rows[i] += prefix;
@@ -21,27 +21,13 @@ void append_identity(matrix& rows, const unsigned int n_bits)
     return;
 }
 
-matrix transpose(const matrix& m, const unsigned int n_bits)
+matrix transpose(const matrix& m, const uint64_t n_bits)
 {
-    // matrix tp;
-    // for (size_t i = 0; i < m.size(); ++i)
-    // {
-    //     code_word wd = 0;
-    //     for (size_t j = 0; j < m.size(); ++j)
-    //     {
-    //         wd <<= 1;
-    //         wd += ((m[j] >> i) & 1);
-    //     }
-    //     tp.push_back(wd);
-    // }
-    // std::reverse(tp.begin(), tp.end()); 
-    // return tp;
-
     matrix tp;
-    for (size_t i = 0; i < n_bits; ++i)
+    for (uint64_t i = 0; i < n_bits; ++i)
     {
         code_word wd = 0;
-        for (size_t j = 0; j < m.size(); ++j)
+        for (uint64_t j = 0; j < m.size(); ++j)
         {
             wd <<= 1;
             wd += ((m[j] >> i) & 1);
@@ -57,10 +43,10 @@ code_word check_symbol(const code_word r, const matrix& check_code)
 {
     code_word cipher = r;
     code_word check = 0;
-    for (size_t i = 0; i < check_code.size(); ++i)
+    for (uint64_t i = 0; i < check_code.size(); ++i)
     {
         check <<= 1;
-        unsigned int dot = row_dot(cipher, check_code[i]);
+        uint64_t dot = row_dot(cipher, check_code[i]);
         check += dot;
     }
     return check;
@@ -70,19 +56,20 @@ std::vector<code_word> check_message(const std::vector<code_word>& message,
                                      const matrix& check_code)
 {
     std::vector<code_word> checktext;
-    for (size_t i = 0; i <  message.size(); ++i)
+    for (uint64_t i = 0; i <  message.size(); ++i)
         checktext.push_back(check_symbol(message[i], check_code));
 
     return checktext;
 }
 
 // this is horribly inefficient - can redo in a clever way
-std::vector<code_word> words_with_at_most_n_bits(const unsigned int n,
-                                                 const unsigned int max_bits)
+std::vector<code_word> words_with_at_most_n_bits(const uint64_t n,
+                                                 const uint64_t max_bits)
 {
     std::vector<code_word> words;
     words.reserve(1000);
-    unsigned int limit = 1 << max_bits;
+    uint64_t limit = 1; // need to it this way round, literal 1 is 32 bit!
+    limit <<= max_bits;
 
     for (code_word wd = 1; wd < limit; ++ wd)
         if (row_weight(wd) <= n)
@@ -92,15 +79,14 @@ std::vector<code_word> words_with_at_most_n_bits(const unsigned int n,
 }
 
 syndrome_table build_syn_table(const matrix& check_matrix,
-                               const unsigned int width,
-                               const unsigned int max_errors)
+                               const uint64_t width,
+                               const uint64_t max_errors)
 {
-    size_t n = width;
+    uint64_t n = width;
 
     std::map<code_word, code_word> s_table;
     std::vector<code_word> errors = words_with_at_most_n_bits(max_errors, n);
-
-    for (size_t i = 0; i < errors.size(); ++i)
+    for (uint64_t i = 0; i < errors.size(); ++i)
     {
         const code_word err = errors[i];
         const code_word check = check_symbol(err, check_matrix);
@@ -111,7 +97,7 @@ syndrome_table build_syn_table(const matrix& check_matrix,
     return s_table;
 }
 
-void print_syn_table(syndrome_table& st, const unsigned int n_bits)
+void print_syn_table(syndrome_table& st, const uint64_t n_bits)
 {
     for (syndrome_table::iterator it = st.begin(); it != st.end(); ++it)
     {
@@ -123,13 +109,13 @@ void print_syn_table(syndrome_table& st, const unsigned int n_bits)
     }
 }
 
-code_word add_upto_n_error(const code_word& wd, const unsigned int width,
-                           const unsigned int n = 1)
+code_word add_upto_n_error(const code_word& wd, const uint64_t width,
+                           const uint64_t n = 1)
 {
     code_word new_word = wd;
-    for (size_t i = 0; i < n; ++i)
+    for (uint64_t i = 0; i < n; ++i)
     {
-        const unsigned int pos = rand() % width;
+        const uint64_t pos = rand() % width;
         new_word = flip_bit(new_word, pos);
     }
     return new_word;

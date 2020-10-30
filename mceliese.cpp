@@ -2,8 +2,8 @@
 
 void applySwap(LinearCode& lc, const permUnit& swp)
 {
-	const size_t c1 = std::get<0>(swp);
-	const size_t c2 = std::get<1>(swp);
+	const uint64_t c1 = std::get<0>(swp);
+	const uint64_t c2 = std::get<1>(swp);
 
 	lc.swapColumns(c1, c2);
 
@@ -14,12 +14,12 @@ void applyPermn(LinearCode& lc, const permn& perm, const bool reverse)
 {
 	if (reverse)
 	{
-		for (size_t i = perm.size(); i > 0; --i)
+		for (uint64_t i = perm.size(); i > 0; --i)
 			applySwap(lc, perm[i-1]);
 	}
 	else
 	{
-		for (size_t i = 0; i < perm.size(); ++i)
+		for (uint64_t i = 0; i < perm.size(); ++i)
 			applySwap(lc, perm[i]);		
 	}
 
@@ -28,13 +28,13 @@ void applyPermn(LinearCode& lc, const permn& perm, const bool reverse)
 	return;
 }
 
-permn RandomPermutation(const size_t width, const size_t upto)
+permn RandomPermutation(const uint64_t width, const uint64_t upto)
 {
 	permn ps;
 	while (ps.size() < upto)
 	{
-		const size_t c1 = rand() % (1 << (2*width));
-		const size_t c2 = rand() % (1 << (2*width));
+		const uint64_t c1 = rand() % (1 << (2*width));
+		const uint64_t c2 = rand() % (1 << (2*width));
 
 		if (c1 == c2)
 			continue;
@@ -47,11 +47,11 @@ permn RandomPermutation(const size_t width, const size_t upto)
 
 void PrintPermutation(const permn& ps)
 {
-	for (size_t i = 0; i < ps.size(); ++i)
+	for (uint64_t i = 0; i < ps.size(); ++i)
 	{
 		const permUnit p = ps[i];
-		const size_t c1 = std::get<0>(p);
-		const size_t c2 = std::get<1>(p);
+		const uint64_t c1 = std::get<0>(p);
+		const uint64_t c2 = std::get<1>(p);
 		std::cout << "(" << c1 << "," << c2 << ")";
 	}
 	std::cout << std::endl;
