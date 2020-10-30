@@ -2,6 +2,7 @@
 #include "matrix.h"
 #include "encode.h"
 #include "linearcode.h"
+#include "mceliese.h"
 
 int main (int argc, char **argv)
 {
@@ -56,6 +57,28 @@ int main (int argc, char **argv)
             print_codeword(plaintext2[i], lc.get_code_with());
         }
     }
+
+    // return 0;
+
+    // permn test_perm = RandomPermutation(2*lc.get_code_with(), 10);
+    // PrintPermutation(test_perm);
+
+    // LinearCode lc2 = lc;
+    // applyPermn(lc2, test_perm);
+    // lc2.print();
+
+    // applyPermn(lc2, test_perm, true);
+    // lc2.print();
+
+    const size_t bitss = 15;
+    matrix bs = find(8, bitss);
+    print_matrix(bs, bitss);
+    for (size_t i = 0; i < bs.size(); ++i)
+        std::cout << bs[i] << ",";
+    std::cout << std::endl;
+
+    LinearCode tc = LinearCode(bs, bitss);
+    tc.print();
 
     return 0;
 }

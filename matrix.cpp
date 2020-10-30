@@ -141,23 +141,6 @@ void order_columns(matrix& m)
     return;
 }
 
-matrix transpose(const matrix& m)
-{
-    matrix tp;
-    for (size_t i = 0; i < m.size(); ++i)
-    {
-        code_word wd = 0;
-        for (size_t j = 0; j < m.size(); ++j)
-        {
-            wd <<= 1;
-            wd += ((m[j] >> i) & 1);
-        }
-        tp.push_back(wd);
-    }
-    std::reverse(tp.begin(), tp.end()); 
-    return tp;
-}
-
 void recursively_build(matrix rows,
                        unsigned int depth,
                        const code_word max_row,
@@ -225,4 +208,29 @@ std::vector<matrix> all(const unsigned int n, const bool verbose)
             std::cout << matrices.size() << std::endl;
     }
     return matrices;
+}
+
+matrix find(const unsigned int n, const unsigned int bits)
+{
+    matrix m;
+    const code_word max = (1 << bits);
+    while(m.size() < n)
+    {
+        code_word c = rand() % max;
+        bool ok = true;
+
+        for (size_t i = 0; i < m.size(); ++i)
+        {
+            if (0 != (row_dot(m[i], c) & 1))
+            {
+                ok = false;
+                break;
+            }
+        }
+
+        if (ok)
+            m.push_back(c);
+    }
+
+    return m;
 }

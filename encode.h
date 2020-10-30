@@ -4,14 +4,16 @@
 
 typedef std::map<code_word, code_word> syndrome_table;
 
-void prepend_identity(matrix& rows);
-void append_identity(matrix& rows);
+void prepend_identity(matrix& rows, const unsigned int n_bits);
+void append_identity(matrix& rows, const unsigned int n_bits);
+matrix transpose(const matrix& m, const unsigned int n_bits);
 
 code_word check_symbol(const code_word r, const matrix& check_code);
 std::vector<code_word> check_message(const std::vector<code_word>& message,
                                      const matrix& check_code);
 
 syndrome_table build_syn_table(const matrix& l_code,
+															 const unsigned int width,
                                const unsigned int max_errors);
 void print_syn_table(syndrome_table& st, const unsigned int n_bits);
 

@@ -1,17 +1,17 @@
 #include "encode.h"
 
-void prepend_identity(matrix& rows)
+void prepend_identity(matrix& rows, const unsigned int n_bits)
 {
-    code_word prefix = (1 << (2*rows.size() - 1));
+    code_word prefix = (1 << (rows.size() + n_bits - 1));
     for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
         rows[i] += prefix;
 
     return;
 }
 
-void append_identity(matrix& rows)
+void append_identity(matrix& rows, const unsigned int n_bits)
 {
-    unsigned int shift = rows.size() - 1;
+    unsigned int shift = n_bits - 1;
     code_word prefix = (1 << shift);
     for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
     {
@@ -20,6 +20,38 @@ void append_identity(matrix& rows)
     }
     return;
 }
+
+matrix transpose(const matrix& m, const unsigned int n_bits)
+{
+    // matrix tp;
+    // for (size_t i = 0; i < m.size(); ++i)
+    // {
+    //     code_word wd = 0;
+    //     for (size_t j = 0; j < m.size(); ++j)
+    //     {
+    //         wd <<= 1;
+    //         wd += ((m[j] >> i) & 1);
+    //     }
+    //     tp.push_back(wd);
+    // }
+    // std::reverse(tp.begin(), tp.end()); 
+    // return tp;
+
+    matrix tp;
+    for (size_t i = 0; i < n_bits; ++i)
+    {
+        code_word wd = 0;
+        for (size_t j = 0; j < m.size(); ++j)
+        {
+            wd <<= 1;
+            wd += ((m[j] >> i) & 1);
+        }
+        tp.push_back(wd);
+    }
+    std::reverse(tp.begin(), tp.end()); 
+    return tp;
+}
+
 
 code_word check_symbol(const code_word r, const matrix& check_code)
 {
@@ -60,9 +92,10 @@ std::vector<code_word> words_with_at_most_n_bits(const unsigned int n,
 }
 
 syndrome_table build_syn_table(const matrix& check_matrix,
+                               const unsigned int width,
                                const unsigned int max_errors)
 {
-    size_t n = 2*check_matrix.size();
+    size_t n = width;
 
     std::map<code_word, code_word> s_table;
     std::vector<code_word> errors = words_with_at_most_n_bits(max_errors, n);
