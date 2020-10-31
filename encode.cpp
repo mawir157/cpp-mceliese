@@ -97,9 +97,9 @@ syndrome_table build_syn_table(const matrix& check_matrix,
     return s_table;
 }
 
-void print_syn_table(syndrome_table& st, const uint64_t n_bits)
+void print_syn_table(const syndrome_table& st, const uint64_t n_bits)
 {
-    for (syndrome_table::iterator it = st.begin(); it != st.end(); ++it)
+    for (syndrome_table::const_iterator it = st.begin(); it != st.end(); ++it)
     {
         std::cout << "[";
         print_codeword(it->first, n_bits, false);

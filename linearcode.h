@@ -22,23 +22,23 @@ class LinearCode
 		void swapColumns(const uint64_t c1, const uint64_t c2);
 
 		// [en/de]-crypting
-		std::vector<code_word> encode_message(const std::vector<code_word>& message);
-		std::vector<code_word> decode_message(const std::vector<code_word>& message);
+		std::vector<code_word> encode_message(const std::vector<code_word>& message) const;
+		std::vector<code_word> decode_message(const std::vector<code_word>& message) const;
 
 		// printing code
-		void print();
+		void print() const;
 	
 	private:
 		matrix mv_generator;
 		matrix mv_check;
-		syndrome_table mm_syndromes;
+		const syndrome_table mm_syndromes;
 		uint64_t mn_code_width; // a '4 bit -> 8 bit' code has mn_code_width = 4;
 		uint64_t mn_max_errors;
 		bool mb_can_decode; // flag gets set to to false during building public key
 
 		// [en/de]-crypting
-		code_word encode_symbol(const code_word r);
-		code_word decode_symbol(const code_word r);
+		code_word encode_symbol(const code_word r) const;
+		code_word decode_symbol(const code_word r) const;
 
-		uint64_t calc_minimum_weight();
+		uint64_t calc_minimum_weight() const;
 };

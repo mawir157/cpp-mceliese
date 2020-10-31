@@ -30,7 +30,7 @@ void LinearCode::swapColumns(const uint64_t c1, const uint64_t c2)
     return;
 }
 
-code_word LinearCode::encode_symbol(const code_word r)
+code_word LinearCode::encode_symbol(const code_word r) const
 {
     code_word plain = r;
     code_word cipher = 0;
@@ -41,7 +41,7 @@ code_word LinearCode::encode_symbol(const code_word r)
     return cipher;
 }
 
-std::vector<code_word> LinearCode::encode_message(const std::vector<code_word>& message)
+std::vector<code_word> LinearCode::encode_message(const std::vector<code_word>& message) const
 {
     std::vector<code_word> ciphertext;
     for (uint64_t i = 0; i <  message.size(); ++i)
@@ -50,7 +50,7 @@ std::vector<code_word> LinearCode::encode_message(const std::vector<code_word>& 
     return ciphertext;
 }
 
-code_word LinearCode::decode_symbol(const code_word r)
+code_word LinearCode::decode_symbol(const code_word r) const
 {
     code_word check = check_symbol(r, mv_check);
     if (0 == check)
@@ -62,7 +62,7 @@ code_word LinearCode::decode_symbol(const code_word r)
     return (temp >> mv_generator.size());
 }
 
-std::vector<code_word> LinearCode::decode_message(const std::vector<code_word>& message)
+std::vector<code_word> LinearCode::decode_message(const std::vector<code_word>& message) const
 {
     if (!mb_can_decode)
     {
@@ -77,7 +77,7 @@ std::vector<code_word> LinearCode::decode_message(const std::vector<code_word>& 
     return plaintext;
 }
 
-uint64_t LinearCode::calc_minimum_weight()
+uint64_t LinearCode::calc_minimum_weight() const
 {
     uint64_t max_word = 1;
     max_word <<= mv_generator.size();
@@ -94,7 +94,7 @@ uint64_t LinearCode::calc_minimum_weight()
     return min_wt;
 }
 
-void LinearCode::print()
+void LinearCode::print() const
 {
     std::cout << "Generating matrix:" << std::endl;
     print_matrix(mv_generator, mv_generator.size() + mn_code_width);

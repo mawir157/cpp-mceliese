@@ -8,12 +8,19 @@ typedef LinearCode McEliesePublic;
 void applySwap(LinearCode& lc, const permUnit& swp);
 void applyPermn(LinearCode& lc, const permn& perm, const bool reverse=false);
 
+void applySwap(code_word& message, const permn& perm);
+void applyPermn(std::vector<code_word>& message, const permn& perm,
+	              const bool reverse=false);
+
 permn RandomPermutation(const uint64_t width, const uint64_t upto);
 void PrintPermutation(const permn& ps);
 
-LinearCode PrivateToPublic(const McEliesePrivate& privKey);
+McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits);
+McEliesePublic PrivateToPublic(const McEliesePrivate& privKey);
 void SaveKeys(const McEliesePrivate& privKey, const McEliesePublic& pubKey);
 
-code_word McE_encypt_symbol(const McEliesePublic& pubKey, const code_word wd);
+std::vector<code_word> McE_encypt_message(const McEliesePublic& pubKey,
+                                          const std::vector<code_word>& message);
 
-code_word McE_decypt_symbol(const McEliesePrivate& privKey, const code_word wd);
+std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
+	                                        const std::vector<code_word>& message);

@@ -32,38 +32,48 @@ int main (int argc, char **argv)
     // LinearCode lc = LinearCode(mats[best_i], n_bits);
     // lc.print();
 
-    n_bits = 24;
-    uint64_t n_words = 4;
-    matrix bs = find(n_words, n_bits);
+    // n_bits = 16;
+    // uint64_t n_words = 8;
+    // matrix bs = find(n_words, n_bits);
 
-    std::vector<code_word> message;
-    for (uint64_t i = 0; i < 100; ++i)
-        message.push_back(rand() % (1 << n_words));
+    // std::vector<code_word> message;
+    // for (uint64_t i = 0; i < 100; ++i)
+    //     message.push_back(rand() % (1 << n_words));
 
-    LinearCode lc = LinearCode(bs, n_bits);
-    lc.print();
+    // LinearCode lc = LinearCode(bs, n_bits);
+    // lc.print();
 
-    std::vector<code_word> ciphertext = lc.encode_message(message);
+    // std::vector<code_word> ciphertext = lc.encode_message(message);
 
-    // add errors to the cipher text
-    std::vector<code_word> errortext;
-    for (uint64_t i = 0; i < ciphertext.size(); ++i)
-        errortext.push_back(add_upto_n_error(ciphertext[i],
-                                             n_words + lc.get_code_with(),
-                                             lc.get_max_error()));
+    // // add errors to the cipher text
+    // std::vector<code_word> errortext;
+    // for (uint64_t i = 0; i < ciphertext.size(); ++i)
+    //     errortext.push_back(add_upto_n_error(ciphertext[i],
+    //                                          n_words + lc.get_code_with(),
+    //                                          lc.get_max_error()));
 
-    std::vector<code_word> plaintext1 = lc.decode_message(ciphertext);
-    std::vector<code_word> plaintext2 = lc.decode_message(errortext);
+    // std::vector<code_word> plaintext1 = lc.decode_message(ciphertext);
+    // std::vector<code_word> plaintext2 = lc.decode_message(errortext);
     
-    for (uint64_t i = 0; i < plaintext1.size(); ++i)
-    {
-        if (plaintext1[i] != plaintext2[i])
-        {
-            print_codeword(plaintext1[i], n_words, false);
-            std::cout << " -> ";
-            print_codeword(plaintext2[i], n_words);
-        }
-    }
+    // for (uint64_t i = 0; i < plaintext1.size(); ++i)
+    // {
+    //     if (plaintext1[i] != plaintext2[i])
+    //     {
+    //         print_codeword(plaintext1[i], n_words, false);
+    //         std::cout << " -> ";
+    //         print_codeword(plaintext2[i], n_words);
+    //     }
+    // }
+
+    McEliesePrivate priv = GenPrivateKey(4, 12);
+    // const matrix C =  std::get<0>(priv);
+    LinearCode   G =  std::get<1>(priv);
+    G.print();
+    const permn  P =  std::get<2>(priv);
+    PrintPermutation(P);
+    McEliesePublic   pub = PrivateToPublic(priv);
+
+    pub.print();
 
     return 0;
 }

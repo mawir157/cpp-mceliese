@@ -15,7 +15,7 @@ std::vector<code_word> check_message(const std::vector<code_word>& message,
 syndrome_table build_syn_table(const matrix& l_code,
 															 const uint64_t width,
                                const uint64_t max_errors);
-void print_syn_table(syndrome_table& st, const uint64_t n_bits);
+void print_syn_table(const syndrome_table& st, const uint64_t n_bits);
 
 std::vector<code_word> words_with_at_most_n_bits(const uint64_t n,
 																								 const uint64_t max_bits);
