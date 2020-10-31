@@ -31,7 +31,7 @@ class LinearCode
 	private:
 		matrix mv_generator;
 		matrix mv_check;
-		const syndrome_table mm_syndromes;
+		syndrome_table mm_syndromes;
 		uint64_t mn_code_width; // a '4 bit -> 8 bit' code has mn_code_width = 4;
 		uint64_t mn_max_errors;
 		bool mb_can_decode; // flag gets set to to false during building public key

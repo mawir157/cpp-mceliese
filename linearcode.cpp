@@ -52,11 +52,11 @@ std::vector<code_word> LinearCode::encode_message(const std::vector<code_word>& 
 
 code_word LinearCode::decode_symbol(const code_word r) const
 {
-    code_word check = check_symbol(r, mv_check);
+    const code_word check = check_symbol(r, mv_check);
     if (0 == check)
         return (r >> mv_generator.size());
 
-    code_word syndrome = mm_syndromes[check];
+    const code_word syndrome = mm_syndromes.at(check);
     code_word temp = row_add(r, syndrome);
 
     return (temp >> mv_generator.size());
