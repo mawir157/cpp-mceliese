@@ -32,9 +32,9 @@ void LinearCode::swapColumns(const size_t c1, const size_t c2)
 
 code_word LinearCode::encode_symbol(const code_word r) const
 {
-    code_word plain = reverse(r, mv_generator.size());
+    code_word plain = reverse(r, code_word_size());
     code_word cipher = 0;
-    for (size_t i = 0; i < mv_generator.size(); ++i, plain >>= 1)
+    for (size_t i = 0; i < code_word_size(); ++i, plain >>= 1)
         if (1 == (plain & 1))
             cipher = row_add(cipher, mv_generator[i]);
 
@@ -80,7 +80,7 @@ std::vector<code_word> LinearCode::decode_message(const std::vector<code_word>& 
 size_t LinearCode::calc_minimum_weight() const
 {
     code_word max_word = 1;
-    max_word <<= mv_generator.size();
+    max_word <<= code_word_size();
     size_t min_wt = 1000;
     for (code_word wd = 1; wd < max_word; ++wd)
     {
@@ -97,11 +97,11 @@ size_t LinearCode::calc_minimum_weight() const
 void LinearCode::print() const
 {
     std::cout << "Generating matrix:" << std::endl;
-    print_matrix(mv_generator, mv_generator.size() + mn_code_width);
+    print_matrix(mv_generator, code_word_size() + mn_code_width);
     if (mb_can_decode)
     {
         std::cout << "Checking matrix:" << std::endl;
-        print_matrix(mv_check, mv_generator.size() + mn_code_width);
+        print_matrix(mv_check, code_word_size() + mn_code_width);
     }
     else
         std::cout << "Cannot decode" << std::endl;
@@ -111,6 +111,6 @@ void LinearCode::print() const
     if (mb_can_decode)
     {
         std::cout << "Syndrome table" << std::endl;
-        print_syn_table(mm_syndromes, mn_code_width);
+        print_syn_table(mm_syndromes, mn_code_width, code_word_size());
     }
 }
