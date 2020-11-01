@@ -116,6 +116,17 @@ code_word flip_bit(const code_word r, const uint64_t c1)
     return (r ^ x); 
 }
 
+code_word reverse(const code_word r, const uint64_t width)
+{
+    code_word p = 0;
+    for (size_t i = 0; i < width; ++i)
+    {
+        p <<= 1;
+        p += (r >> i) & 1;
+    }
+    return p;
+}
+
 void swap_columns(matrix& m, const uint64_t c1, const uint64_t c2)
 {
     for (uint64_t j=0; j < m.size(); ++j)

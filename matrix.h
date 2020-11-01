@@ -20,6 +20,7 @@ void print_matrix(const matrix rows, uint64_t n=0);
 bool order_by_weight(const code_word r1, const code_word r2);
 code_word swap_bits(const code_word r, const uint64_t c1, const uint64_t c2);
 code_word flip_bit(const code_word r, const uint64_t c1);
+code_word reverse(const code_word r, const uint64_t width);
 void swap_columns(matrix& m, const uint64_t c1, const uint64_t c2);
 void order_columns(matrix& m);
 

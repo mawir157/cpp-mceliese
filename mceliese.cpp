@@ -119,6 +119,16 @@ McEliesePublic PrivateToPublic(const McEliesePrivate& privKey)
 std::vector<code_word> McE_encypt_message(const McEliesePublic& pubKey,
                                           const std::vector<code_word>& message)
 {
+    std::vector<code_word> message_w_errs;
+    for (size_t i = 0; i < message.size(); ++i)
+    {
+        message_w_errs.push_back(
+            add_upto_n_error(message[i],
+                             pubKey.code_word_size() + pubKey.get_code_with(),
+                             pubKey.get_max_error())
+            );
+    }
+
     return pubKey.encode_message(message);
 }
 
