@@ -5,6 +5,11 @@ typedef std::vector<permUnit> permn;
 typedef std::tuple<matrix, LinearCode, permn> McEliesePrivate;
 typedef LinearCode McEliesePublic;
 
+void hackLinearComb(LinearCode& lc, const bool reverse=false);
+std::vector<code_word> hackLinearComb(const std::vector<code_word>& message,
+	                                    const size_t bits,
+	                                    const bool reverse=false);
+
 void applySwap(LinearCode& lc, const permUnit& swp);
 void applyPermn(LinearCode& lc, const permn& perm, const bool reverse=false);
 

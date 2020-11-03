@@ -1,5 +1,49 @@
 #include "mceliese.h"
 
+// doing this properly is v difficult I will come back a do properly later
+std::vector<code_word> hackLinearComb(const std::vector<code_word>& M,
+                                      const size_t bits, const bool rev)
+{
+    matrix scrambled;
+
+    if (!rev)
+    {
+        scrambled.push_back(M[0]);
+        for (size_t i = 1; i < M.size(); ++i)
+            scrambled.push_back(row_add(M[i-1], M[i]));
+    }
+    else
+    {
+        for (size_t i = 0; i < M.size(); ++i)
+        {
+            code_word cipher = M[i];
+            bool temp = get_bit(cipher, 0);
+            code_word plain = (temp ? 1 : 0);
+
+            for (size_t j = 1; j < bits; ++j)
+            {
+                plain <<= 1;
+                temp ^= get_bit(cipher, j);
+                plain += (temp ? 1 : 0);
+            }
+
+            plain = reverse(plain, bits);
+            scrambled.push_back(plain);
+        }
+    }
+    std::cout << std::endl;
+    return scrambled;
+}
+
+void hackLinearComb(LinearCode& lc, const bool rev)
+{
+    matrix scrambled = hackLinearComb(lc.get_gen_mat(), rev);
+    for (size_t i = 0; i < scrambled.size(); ++i)
+        lc.replaceRow(i, scrambled[i]);
+
+    return;
+}
+
 void applySwap(LinearCode& lc, const permUnit& swp)
 {
     const uint64_t c1 = std::get<0>(swp);
@@ -15,9 +59,9 @@ void applySwap(code_word& message, const permn& perm)
 
 }
 
-void applyPermn(LinearCode& lc, const permn& perm, const bool reverse)
+void applyPermn(LinearCode& lc, const permn& perm, const bool rev)
 {
-    if (reverse)
+    if (rev)
     {
         for (uint64_t i = perm.size(); i > 0; --i)
             applySwap(lc, perm[i-1]);
@@ -34,9 +78,9 @@ void applyPermn(LinearCode& lc, const permn& perm, const bool reverse)
 }
 
 void applyPermn(std::vector<code_word>& message, const permn& ps,
-                const bool reverse)
+                const bool rev)
 {
-    if (reverse)
+    if (rev)
     {
         for (uint64_t i = ps.size(); i > 0; --i)
         {
@@ -90,15 +134,20 @@ void PrintPermutation(const permn& ps)
 
 McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits)
 {
-    matrix C;
+    matrix C/* = find(words, words)*/;
 
     matrix bs = find(words, bits);
+std::cout << "Found generating matrix...\n";
+std::cout << "Building linear code...\n";
+clock_t startTime = clock();
     LinearCode G = LinearCode(bs, bits);
-
+std::cout << "Time to build syndrome tablle: "
+          << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
+          << " seconds." << std::endl;
+std::cout << "Max errors: " << G.get_max_error() << std::endl;
     const uint64_t width = words + bits;
 
-    // permn P = RandomPermutation(width, 2 * width);
-    permn P = RandomPermutation(width, 1);
+    permn P = RandomPermutation(width, 8 * width + 1);
 
     McEliesePrivate PriKey = {C, G, P};
 
@@ -111,8 +160,8 @@ McEliesePublic PrivateToPublic(const McEliesePrivate& privKey)
     LinearCode   G =  std::get<1>(privKey);
     const permn  P =  std::get<2>(privKey);
 
-    // applyPermn(G, P);
-
+    hackLinearComb(G, -1);
+    applyPermn(G, P);
     return G;
 }
 
@@ -139,7 +188,9 @@ std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
     const permn      P =  std::get<2>(privKey);
 
     std::vector<code_word> ms = message;
-    // applyPermn(ms, P, true);
+    applyPermn(ms, P, true);
+    ms = G.decode_message(ms);
+    ms = hackLinearComb(ms, G.code_word_size(), true);
 
-    return G.decode_message(ms);
+    return ms;
 }

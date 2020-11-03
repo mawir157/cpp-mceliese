@@ -10,10 +10,10 @@ class LinearCode
 		~LinearCode();
 
 		// getters
-		matrix get_gen_mat()   const { return mv_generator; }
-		matrix get_check_mat() const { return mv_check; }
-		size_t get_code_with() const { return mn_code_width; }
-		size_t get_max_error() const { return mn_max_errors; }
+		matrix get_gen_mat()    const { return mv_generator; }
+		// matrix get_check_mat()  const { return mv_check; }
+		size_t get_code_with()  const { return mn_code_width; }
+		size_t get_max_error()  const { return mn_max_errors; }
 		size_t code_word_size() const { return mv_generator.size(); }
 
 		// setters
@@ -21,6 +21,7 @@ class LinearCode
 
 		// swap function
 		void swapColumns(const size_t c1, const size_t c2);
+		void replaceRow(const size_t r, const code_word wd);
 
 		// [en/de]-crypting
 		std::vector<code_word> encode_message(const std::vector<code_word>& message) const;

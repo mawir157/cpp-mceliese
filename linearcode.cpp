@@ -30,6 +30,11 @@ void LinearCode::swapColumns(const size_t c1, const size_t c2)
     return;
 }
 
+void LinearCode::replaceRow(const size_t r, const code_word wd)
+{
+    mv_generator[r] = wd;
+}
+
 code_word LinearCode::encode_symbol(const code_word r) const
 {
     code_word plain = reverse(r, code_word_size());

@@ -85,7 +85,12 @@ syndrome_table build_syn_table(const matrix& check_matrix,
     uint64_t n = width;
 
     std::map<code_word, code_word> s_table;
+clock_t startTime = clock();
     std::vector<code_word> errors = words_with_at_most_n_bits(max_errors, n);
+std::cout << "One: "
+          << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
+          << " seconds." << std::endl;
+startTime = clock();
     for (uint64_t i = 0; i < errors.size(); ++i)
     {
         const code_word err = errors[i];
@@ -93,6 +98,9 @@ syndrome_table build_syn_table(const matrix& check_matrix,
 
         s_table[check] = err;
     }
+std::cout << "Two: "
+          << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
+          << " seconds." << std::endl;
 
     return s_table;
 }
