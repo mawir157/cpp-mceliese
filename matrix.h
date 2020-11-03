@@ -22,6 +22,7 @@ code_word swap_bits(const code_word r, const size_t c1, const size_t c2);
 code_word flip_bit(const code_word r, const size_t c1);
 bool get_bit(const code_word r, const size_t c1);
 code_word set_bit(const code_word r, const size_t n, const bool bit);
+code_word vec_to_code_word(const std::vector<size_t> v);
 code_word reverse(const code_word r, const size_t width);
 void swap_columns(matrix& m, const size_t c1, const size_t c2);
 void order_columns(matrix& m);

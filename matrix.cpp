@@ -151,6 +151,15 @@ code_word set_bit(const code_word r, const size_t n, const bool bit)
         return (r & ~v);// we are setting a bit to 0
 }
 
+code_word vec_to_code_word(const std::vector<size_t> v)
+{
+    code_word cw = 0;
+    for (size_t i = 0; i < v.size(); ++i)
+        cw = set_bit(cw, v[i], true);
+
+    return cw;
+}
+
 void order_columns(matrix& m)
 {
     std::vector<size_t> col_wts = column_weights(m);

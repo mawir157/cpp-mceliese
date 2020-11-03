@@ -137,14 +137,8 @@ McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits)
     matrix C/* = find(words, words)*/;
 
     matrix bs = find(words, bits);
-std::cout << "Found generating matrix...\n";
-std::cout << "Building linear code...\n";
-clock_t startTime = clock();
+
     LinearCode G = LinearCode(bs, bits);
-std::cout << "Time to build syndrome tablle: "
-          << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
-          << " seconds." << std::endl;
-std::cout << "Max errors: " << G.get_max_error() << std::endl;
     const uint64_t width = words + bits;
 
     permn P = RandomPermutation(width, 8 * width + 1);

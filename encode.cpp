@@ -67,15 +67,37 @@ std::vector<code_word> words_with_at_most_n_bits(const uint64_t n,
                                                  const uint64_t max_bits)
 {
     std::vector<code_word> words;
-    words.reserve(1000);
-    uint64_t limit = 1; // need to it this way round, literal 1 is 32 bit!
-    limit <<= max_bits;
+    std::vector<size_t> ns; // ns = [0,1,2,..,max_bits - 1]
+    for(size_t i = 0; i < max_bits; ++i)
+        ns.push_back(i);
 
-    for (code_word wd = 1; wd < limit; ++ wd)
-        if (row_weight(wd) <= n)
-            words.push_back(wd);
+    for (size_t m = 1; m <= n; ++m)
+    {
+        std::vector<std::vector<size_t>> cs;
+        std::vector<size_t> comb;
+        combs(cs, ns, comb, 0, m);
 
+        for (size_t i = 0; i < cs.size(); ++i)
+            words.push_back(vec_to_code_word(cs[i]));
+    }
     return words;
+}
+
+void combs(std::vector<std::vector<size_t>>& cs, const std::vector<size_t>& ss,
+           std::vector<size_t>& combination,
+           const size_t offset, const size_t k) {
+  if (k == 0)
+  {
+    cs.push_back(combination);
+    return;
+  }
+  for (size_t i = offset; i <= ss.size() - k; ++i)
+  {
+    combination.push_back(ss[i]);
+    combs(cs, ss, combination, i+1, k-1);
+    combination.pop_back();
+  }
+  return;
 }
 
 syndrome_table build_syn_table(const matrix& check_matrix,
@@ -85,12 +107,7 @@ syndrome_table build_syn_table(const matrix& check_matrix,
     uint64_t n = width;
 
     std::map<code_word, code_word> s_table;
-clock_t startTime = clock();
     std::vector<code_word> errors = words_with_at_most_n_bits(max_errors, n);
-std::cout << "One: "
-          << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
-          << " seconds." << std::endl;
-startTime = clock();
     for (uint64_t i = 0; i < errors.size(); ++i)
     {
         const code_word err = errors[i];
@@ -98,9 +115,6 @@ startTime = clock();
 
         s_table[check] = err;
     }
-std::cout << "Two: "
-          << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
-          << " seconds." << std::endl;
 
     return s_table;
 }

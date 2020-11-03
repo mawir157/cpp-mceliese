@@ -71,6 +71,7 @@ int main (int argc, char **argv)
 
     return 0;
 */
+
     uint64_t n_words = 8;
     n_bits = 23;
     McEliesePrivate priv = GenPrivateKey(n_words, n_bits);
@@ -85,24 +86,19 @@ int main (int argc, char **argv)
         message.push_back(rand() % (1 << n_words));
 
     std::vector<code_word> ciphertext = McE_encypt_message(pub, message);
-    // pub.encode_message(message);
-for (size_t i = 0; i < message.size(); ++i)
-{
-    print_codeword(message[i], n_words, false);
-    std::cout << (i + 1 == message.size() ? "\n" : "-");
-}
-
-    // for (size_t i = 0; i < ciphertext.size(); ++ i)
-    //     std::cout << ciphertext[i] << "-";
-    // std::cout << std::endl;
+    for (size_t i = 0; i < message.size(); ++i)
+    {
+        print_codeword(message[i], n_words, false);
+        std::cout << (i + 1 == message.size() ? "\n" : "-");
+    }
 
     std::vector<code_word> plaintext = McE_decypt_message(priv, ciphertext);
 
-for (size_t i = 0; i < plaintext.size(); ++i)
-{
-    print_codeword(plaintext[i], n_words, false);
-    std::cout << (i + 1 == plaintext.size() ? "\n" : "-");
-}
+    for (size_t i = 0; i < plaintext.size(); ++i)
+    {
+        print_codeword(plaintext[i], n_words, false);
+        std::cout << (i + 1 == plaintext.size() ? "\n" : "-");
+    }
 
     return 0;
 }
