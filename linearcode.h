@@ -27,6 +27,10 @@ class LinearCode
 		std::vector<code_word> encode_message(const std::vector<code_word>& message) const;
 		std::vector<code_word> decode_message(const std::vector<code_word>& message) const;
 
+		// i/o
+		void write_to_file(const std::string filename)  const;
+		void read_from_file(const std::string filename) const;
+
 		// printing code
 		void print() const;
 	

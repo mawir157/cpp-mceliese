@@ -49,7 +49,7 @@ code_word LinearCode::encode_symbol(const code_word r) const
 std::vector<code_word> LinearCode::encode_message(const std::vector<code_word>& message) const
 {
     std::vector<code_word> ciphertext;
-    for (size_t i = 0; i <  message.size(); ++i)
+    for (size_t i = 0; i < message.size(); ++i)
         ciphertext.push_back(encode_symbol(message[i]));
 
     return ciphertext;
@@ -76,7 +76,7 @@ std::vector<code_word> LinearCode::decode_message(const std::vector<code_word>& 
     }
 
     std::vector<code_word> plaintext;
-    for (size_t i = 0; i <  message.size(); ++i)
+    for (size_t i = 0; i < message.size(); ++i)
         plaintext.push_back(decode_symbol(message[i]));
 
     return plaintext;

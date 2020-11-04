@@ -6,6 +6,7 @@
 // #include <cmath>
 // #include <complex>
 #include <cstdint>
+#include <cstring>
 // #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -13,8 +14,14 @@
 // #include <memory>
 // #include <random>
 // #include <set>
-// #include <string>
+#include <string>
 #include <tuple>
 #include <vector>
 
 #include <math.h>
+
+enum RunMode { orthogonal,
+	             generate_keys,
+	             encode_message,
+	             decode_message,
+	             unknown };

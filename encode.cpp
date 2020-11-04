@@ -24,10 +24,10 @@ void append_identity(matrix& rows, const uint64_t n_bits)
 matrix transpose(const matrix& m, const uint64_t n_bits)
 {
     matrix tp;
-    for (uint64_t i = 0; i < n_bits; ++i)
+    for (size_t i = 0; i < n_bits; ++i)
     {
         code_word wd = 0;
-        for (uint64_t j = 0; j < m.size(); ++j)
+        for (size_t j = 0; j < m.size(); ++j)
         {
             wd <<= 1;
             wd += ((m[j] >> i) & 1);
@@ -43,10 +43,10 @@ code_word check_symbol(const code_word r, const matrix& check_code)
 {
     code_word cipher = r;
     code_word check = 0;
-    for (uint64_t i = 0; i < check_code.size(); ++i)
+    for (code_word i = 0; i < check_code.size(); ++i)
     {
         check <<= 1;
-        uint64_t dot = row_dot(cipher, check_code[i]);
+        code_word dot = row_dot(cipher, check_code[i]);
         check += dot;
     }
     return check;
@@ -56,7 +56,7 @@ std::vector<code_word> check_message(const std::vector<code_word>& message,
                                      const matrix& check_code)
 {
     std::vector<code_word> checktext;
-    for (uint64_t i = 0; i <  message.size(); ++i)
+    for (size_t i = 0; i <  message.size(); ++i)
         checktext.push_back(check_symbol(message[i], check_code));
 
     return checktext;
