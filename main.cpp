@@ -133,6 +133,8 @@ int main (int argc, char **argv)
             std::cout << (i + 1 == plaintext.size() ? "\n" : "-");
         }
 
+        SaveKeys(priv, pub, ".");
+
         return 0;     
     }
 

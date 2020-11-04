@@ -188,3 +188,54 @@ std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
 
     return ms;
 }
+
+void SaveKeys(const McEliesePrivate& privKey,
+              const McEliesePublic& pubKey,
+              const std::string dir_path)
+{
+    std::string public_key_dir = dir_path;
+    public_key_dir.append("/");
+    public_key_dir.append("public.mce");
+
+    std::string private_key_dir = dir_path;
+    private_key_dir.append("/");
+    private_key_dir.append("private.mce");
+    ////////////////////////////////////////////////////////////////////////////
+    std::ofstream public_file;
+    public_file.open(public_key_dir, std::ofstream::out | std::ofstream::trunc);
+
+    const matrix R = pubKey.get_gen_mat();
+    for (size_t i = 0; i < R.size(); ++i)
+    {
+       public_file << R[i]
+                    << (i + 1 == R.size() ? "\n" : ",");
+    }
+    public_file.close();
+
+    ////////////////////////////////////////////////////////////////////////////
+    std::ofstream private_file;
+    private_file.open(private_key_dir, std::ofstream::out | std::ofstream::trunc);
+
+    const LinearCode G = std::get<1>(privKey);
+    const permn      P = std::get<2>(privKey);
+    const matrix     M = G.get_gen_mat();
+
+    for (size_t i = 0; i < M.size(); ++i)
+    {
+       private_file << M[i]
+                   << (i + 1 == M.size() ? "\n" : ",");
+    }
+    private_file << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+"
+                << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;
+    
+    for (size_t i = 0; i < P.size(); ++i)
+    {
+        const uint64_t c1 = std::get<0>(P[i]);
+        const uint64_t c2 = std::get<1>(P[i]);
+
+        private_file << c1 << "|" << c2
+                    << (i + 1 == P.size() ? "\n" : ",");
+    }
+
+    private_file.close();
+}
