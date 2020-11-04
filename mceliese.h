@@ -24,7 +24,11 @@ McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits);
 McEliesePublic PrivateToPublic(const McEliesePrivate& privKey);
 void SaveKeys(const McEliesePrivate& privKey,
 	            const McEliesePublic& pubKey,
-	            const std::string dir_path);
+	            const std::string& dir_path);
+
+McEliesePrivate ReadPrivateKey(const std::string& file_path);
+McEliesePublic ReadPublicKey(const std::string& file_path);
+std::vector<code_word> ReadCSV(const std::string& file_path);
 
 std::vector<code_word> McE_encypt_message(const McEliesePublic& pubKey,
                                           const std::vector<code_word>& message);

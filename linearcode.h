@@ -6,7 +6,7 @@
 class LinearCode
 {
 	public:
-		LinearCode(const matrix& M, const uint64_t width);
+		LinearCode(const matrix& M, const size_t width);
 		~LinearCode();
 
 		// getters
@@ -15,9 +15,13 @@ class LinearCode
 		size_t get_code_with()  const { return mn_code_width; }
 		size_t get_max_error()  const { return mn_max_errors; }
 		size_t code_word_size() const { return mv_generator.size(); }
+		matrix get_extra_bits() const;
 
 		// setters
 		void set_decode_flag(const bool b) { mb_can_decode = b; }
+		void set_generator(const matrix& M) { mv_generator = M;
+			                                  mb_can_decode = false; }
+		void set_max_errors(const size_t n) { mn_max_errors = n ; }
 
 		// swap function
 		void swapColumns(const size_t c1, const size_t c2);

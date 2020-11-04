@@ -1,6 +1,6 @@
 #include "linearcode.h"
 
-LinearCode::LinearCode(const matrix& M, const uint64_t width) : 
+LinearCode::LinearCode(const matrix& M, const size_t width) : 
     mn_code_width(width), mb_can_decode(true)
 {
     mv_generator = M;
@@ -118,4 +118,14 @@ void LinearCode::print() const
         std::cout << "Syndrome table" << std::endl;
         print_syn_table(mm_syndromes, mn_code_width, code_word_size());
     }
+}
+
+matrix LinearCode::get_extra_bits() const
+{
+    matrix x_bits;
+    code_word mask = 1 << mn_code_width;
+    for (size_t i = 0; i < mv_generator.size(); ++i)
+        x_bits.push_back(mv_generator[i] % mask);
+    
+    return x_bits;
 }

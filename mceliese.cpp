@@ -191,7 +191,7 @@ std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
 
 void SaveKeys(const McEliesePrivate& privKey,
               const McEliesePublic& pubKey,
-              const std::string dir_path)
+              const std::string& dir_path)
 {
     std::string public_key_dir = dir_path;
     public_key_dir.append("/");
@@ -203,6 +203,9 @@ void SaveKeys(const McEliesePrivate& privKey,
     ////////////////////////////////////////////////////////////////////////////
     std::ofstream public_file;
     public_file.open(public_key_dir, std::ofstream::out | std::ofstream::trunc);
+
+    public_file << pubKey.get_code_with() << std::endl;
+    public_file << pubKey.get_max_error() << std::endl;
 
     const matrix R = pubKey.get_gen_mat();
     for (size_t i = 0; i < R.size(); ++i)
@@ -218,7 +221,9 @@ void SaveKeys(const McEliesePrivate& privKey,
 
     const LinearCode G = std::get<1>(privKey);
     const permn      P = std::get<2>(privKey);
-    const matrix     M = G.get_gen_mat();
+    const matrix     M = G.get_extra_bits();
+
+    private_file << G.get_code_with() << std::endl;
 
     for (size_t i = 0; i < M.size(); ++i)
     {
@@ -238,4 +243,117 @@ void SaveKeys(const McEliesePrivate& privKey,
     }
 
     private_file.close();
+}
+
+McEliesePrivate ReadPrivateKey(const std::string& file_path)
+{
+    std::string line;
+    std::ifstream data_file(file_path);
+
+    size_t w;
+    matrix C;
+    matrix G;
+    permn  P;
+
+    getline(data_file, line);
+    w = std::stoi(line.substr(0, 10));
+
+    getline(data_file, line);
+    int from = 0;
+    int comma = line.find(",", from);
+    int value = std::stoi(line.substr(from, comma - from));
+    G.push_back(value);
+    while (comma > 0)
+    {
+        from = comma + 1;
+        comma = line.find(",", from);
+
+        value = std::stoi(line.substr(from, comma - from));
+        G.push_back(value);
+    }
+
+    LinearCode lc = LinearCode(G, w);
+    
+    getline(data_file, line); // skip line
+    getline(data_file, line);
+
+    from    = 0;
+    int bar = line.find("|", from);
+    comma   = line.find(",", from);
+    int value2;
+    while (comma > 0)
+    {
+        value = std::stoi(line.substr(from, bar - from));
+        value2 = std::stoi(line.substr(bar+1, comma - bar + 1));
+        G.push_back(value);
+
+        from = comma + 1;
+        comma = line.find(",", from);
+        bar = line.find("|", from);
+
+        permUnit p(value, value2);
+        P.push_back(p);
+    }
+
+    McEliesePrivate PrivateKey = {C, lc, P};
+
+    return PrivateKey;
+}
+
+McEliesePublic ReadPublicKey(const std::string& file_path)
+{
+    std::string line;
+    std::ifstream data_file(file_path);
+
+    matrix G;
+
+    getline(data_file, line);
+    size_t w = std::stoi(line.substr(0, 10));
+    getline(data_file, line);
+    size_t errs = std::stoi(line.substr(0, 10));
+
+    getline(data_file, line);
+    int from = 0;
+    int comma = line.find(",", from);
+    int value = std::stoi(line.substr(from, comma - from));
+    G.push_back(value);;
+    while (comma > 0)
+    {
+        from = comma + 1;
+        comma = line.find(",", from);
+
+        value = std::stoi(line.substr(from, comma - from));
+        G.push_back(value);
+    }
+    // size_t w = G.size();
+    LinearCode lc(G, w);
+ 
+    lc.set_generator(G);
+    lc.set_max_errors(errs);
+
+    return lc;
+}
+
+std::vector<code_word> ReadCSV(const std::string& file_path)
+{
+    std::string line;
+    std::ifstream data_file(file_path);
+
+    std::vector<code_word> message;
+
+    getline(data_file, line);
+    int from = 0;
+    int comma = line.find(",", from);
+    int value = std::stoi(line.substr(from, comma - from));
+    message.push_back(value);;
+    while (comma > 0)
+    {
+        from = comma + 1;
+        comma = line.find(",", from);
+
+        value = std::stoi(line.substr(from, comma - from));
+        message.push_back(value);
+    }
+
+    return message;
 }
