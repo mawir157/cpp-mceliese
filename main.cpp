@@ -73,6 +73,11 @@ int main (int argc, char **argv)
             message_file = argv[2];
             key_file     = argv[3];
         }
+        else if  ((std::strcmp(argv[1], "-t") == 0) ||
+                  (std::strcmp(argv[1], "-T") == 0))
+        {
+            // available for super secret, undocumented test mode!
+        }
         else
         {
             std::cout << "Invalid option" << std::endl;
@@ -108,30 +113,7 @@ int main (int argc, char **argv)
         size_t n_words = arg_1;
         size_t n_bits = arg_2;
         McEliesePrivate priv = GenPrivateKey(n_words, n_bits);
-        LinearCode         G =  std::get<1>(priv);
         McEliesePublic   pub = PrivateToPublic(priv);
-        
-        G.print();
-        // pub.print();
-
-        std::vector<code_word> message;
-        for (uint64_t i = 0; i < 25; ++i)
-            message.push_back(rand() % (1 << n_words));
-
-        std::vector<code_word> ciphertext = McE_encypt_message(pub, message);
-        for (size_t i = 0; i < message.size(); ++i)
-        {
-            print_codeword(message[i], n_words, false);
-            std::cout << (i + 1 == message.size() ? "\n" : "-");
-        }
-
-        std::vector<code_word> plaintext = McE_decypt_message(priv, ciphertext);
-
-        for (size_t i = 0; i < plaintext.size(); ++i)
-        {
-            print_codeword(plaintext[i], n_words, false);
-            std::cout << (i + 1 == plaintext.size() ? "\n" : "-");
-        }
 
         SaveKeys(priv, pub, ".");
 
@@ -141,41 +123,23 @@ int main (int argc, char **argv)
     if (RunMode::encode_message == mode)
     {
         McEliesePublic overt = ReadPublicKey(key_file);
-
-        // overt.print();
-
         std::vector<code_word> message = ReadCSV(message_file);
 
         std::vector<code_word> ciphertext = McE_encypt_message(overt, message);
         
         for (size_t i = 0; i < ciphertext.size(); ++i)
-        {
-            // print_codeword(ciphertext[i], overt.code_word_size(), false);
-            std::cout << ciphertext[i];
-            std::cout << (i + 1 == ciphertext.size() ? "\n" : ",");
-        }
+            std::cout << ciphertext[i] << (i + 1 == ciphertext.size() ? "\n" : ",");
     }
 
     if (RunMode::decode_message == mode)
     {
         McEliesePrivate covert = ReadPrivateKey(key_file);
-
         std::vector<code_word> message = ReadCSV(message_file);
 
         std::vector<code_word> plaintext = McE_decypt_message(covert, message);
 
-        const LinearCode G = std::get<1>(covert);
-        const permn      P = std::get<2>(covert);
-        const matrix     M = G.get_gen_mat();
-        G.print();
-        PrintPermutation(P);
-
         for (size_t i = 0; i < plaintext.size(); ++i)
-        {
-            // print_codeword(plaintext[i], G.code_word_size(), false);
-            std::cout << plaintext[i];
-            std::cout << (i + 1 == plaintext.size() ? "\n" : ",");
-        }
+            std::cout << plaintext[i] << (i + 1 == plaintext.size() ? "\n" : ",");
     }
 
     return 0;

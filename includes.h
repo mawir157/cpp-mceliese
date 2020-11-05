@@ -24,4 +24,5 @@ enum RunMode { orthogonal,
 	             generate_keys,
 	             encode_message,
 	             decode_message,
+	             test_mode,
 	             unknown };

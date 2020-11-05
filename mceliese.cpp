@@ -273,7 +273,6 @@ McEliesePrivate ReadPrivateKey(const std::string& file_path)
     }
 
     LinearCode lc = LinearCode(G, w);
-    
     getline(data_file, line); // skip line
     getline(data_file, line);
 
@@ -281,15 +280,19 @@ McEliesePrivate ReadPrivateKey(const std::string& file_path)
     int bar = line.find("|", from);
     comma   = line.find(",", from);
     int value2;
+
+    value = std::stoi(line.substr(from, bar - from));
+    value2 = std::stoi(line.substr(bar+1, comma - bar + 1));
+    permUnit p(value, value2);
+    P.push_back(p);
     while (comma > 0)
     {
-        value = std::stoi(line.substr(from, bar - from));
-        value2 = std::stoi(line.substr(bar+1, comma - bar + 1));
-        G.push_back(value);
-
         from = comma + 1;
         comma = line.find(",", from);
         bar = line.find("|", from);
+
+        value = std::stoi(line.substr(from, bar - from));
+        value2 = std::stoi(line.substr(bar+1, comma - bar + 1));
 
         permUnit p(value, value2);
         P.push_back(p);
