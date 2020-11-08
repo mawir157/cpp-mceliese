@@ -2,11 +2,9 @@
 
 #include "matrix.h"
 
-typedef std::map<code_word, code_word> syndrome_table;
-
-void prepend_identity(matrix& rows, const uint64_t n_bits);
-void append_identity(matrix& rows, const uint64_t n_bits);
-matrix transpose(const matrix& m, const uint64_t n_bits);
+void prepend_identity(matrix& rows, const size_t n_bits);
+void append_identity(matrix& rows, const size_t n_bits);
+matrix transpose(const matrix& m, const size_t n_bits);
 
 code_word check_symbol(const code_word r, const matrix& check_code);
 std::vector<code_word> check_message(const std::vector<code_word>& message,
