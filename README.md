@@ -15,7 +15,7 @@ where
       
 The encryption process will map a `dim`-bit symbol to a `dim + extra_bits` symbol.
 
-Currently we impose that `dim + extra_bits < 32`.
+Currently we impose that `dim + extra_bits < 64`.
 
 Creates two files `private.mce` and `public.mce`.
 
