@@ -23,7 +23,7 @@ typedef std::vector<code_word> matrix;
 
 //
 inline bool operator==(const matrix& lhs, const matrix& rhs);
-code_word row_dot(const code_word r1, const code_word r2);
+size_t row_dot(const code_word r1, const code_word r2);
 code_word row_add(const code_word r1, const code_word r2);
 
 size_t col_weight(const matrix& rows, const size_t c1);

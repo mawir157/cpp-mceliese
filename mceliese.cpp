@@ -210,8 +210,7 @@ void SaveKeys(const McEliesePrivate& privKey,
     const matrix R = pubKey.get_gen_mat();
     for (size_t i = 0; i < R.size(); ++i)
     {
-       public_file << R[i]
-                    << (i + 1 == R.size() ? "\n" : ",");
+       public_file << R[i] << (i + 1 == R.size() ? "\n" : ",");
     }
     public_file.close();
 
@@ -227,8 +226,7 @@ void SaveKeys(const McEliesePrivate& privKey,
 
     for (size_t i = 0; i < M.size(); ++i)
     {
-       private_file << M[i]
-                   << (i + 1 == M.size() ? "\n" : ",");
+       private_file << M[i] << (i + 1 == M.size() ? "\n" : ",");
     }
     private_file << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+"
                 << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;

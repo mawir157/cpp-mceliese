@@ -12,7 +12,7 @@ inline bool operator==(const matrix& lhs, const matrix& rhs)
     return true;
 }
 
-code_word row_dot(const code_word r1, const code_word r2)
+size_t row_dot(const code_word r1, const code_word r2)
 {
     return row_weight(r1 & r2) % 2;
 }
@@ -52,14 +52,15 @@ size_t row_weight(const code_word& r)
 
 void print_codeword(code_word r, const size_t n, const bool new_line)
 {
-    std::vector<code_word> bin;
-    for (size_t i = 0; i < n; ++i)
-    {
-        bin.push_back(r & BS1);
-        r >>= 1;
-    }
-    for (size_t i = 1; i <= n; ++i)
-        std::cout << bin[n - i];
+    // std::vector<code_word> bin;
+    // for (size_t i = 0; i < n; ++i)
+    // {
+    //     bin.push_back(r & BS1);
+    //     r >>= 1;
+    // }
+    // for (size_t i = 1; i <= n; ++i)
+    //     std::cout << bin[n - i];
+    std::cout << r;
 
     if (new_line)
         std::cout << std::endl;
@@ -199,7 +200,7 @@ void recursively_build(matrix rows,
         bool ok = true;
         for (uint64_t i = 0; i < rows.size(); ++i)
         {
-            if (BS1 == (row_dot(rows[i], rw) & BS1))
+            if (1 == row_dot(rows[i], rw))
             {
                 ok = false;
                 break;
@@ -256,7 +257,7 @@ matrix find(const uint64_t n, const uint64_t bits)
 
         for (uint64_t i = 0; i < m.size(); ++i)
         {
-            if (BS1 == (row_dot(m[i], c) & BS1))
+            if (1 == row_dot(m[i], c))
             {
                 ok = false;
                 break;

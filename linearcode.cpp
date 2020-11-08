@@ -60,8 +60,7 @@ code_word LinearCode::decode_symbol(const code_word r) const
     const code_word check = check_symbol(r, mv_check);
     if (BS0 == check)
         return (r >> mn_code_width);
-print_codeword(r, mn_code_width + code_word_size());
-print_codeword(check, mn_code_width);
+std::cout << check << std::endl;
     const code_word syndrome = mm_syndromes.at(check);
     code_word temp = row_add(r, syndrome);
 

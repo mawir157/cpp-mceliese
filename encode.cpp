@@ -2,7 +2,9 @@
 
 void prepend_identity(matrix& rows, const size_t n_bits)
 {
-    code_word prefix = (1 << (rows.size() + n_bits - 1));
+    // have to do this in two steps since literal 1 is 32-bit
+    code_word prefix = 1;
+    prefix <<= (rows.size() + n_bits - 1);
     for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
         rows[i] |= prefix;
 
@@ -62,9 +64,8 @@ std::vector<code_word> check_message(const std::vector<code_word>& message,
     return checktext;
 }
 
-// this is horribly inefficient - can redo in a clever way
-std::vector<code_word> words_with_at_most_n_bits(const uint64_t n,
-                                                 const uint64_t max_bits)
+std::vector<code_word> words_with_at_most_n_bits(const size_t n,
+                                                 const size_t max_bits)
 {
     std::vector<code_word> words;
     std::vector<size_t> ns; // ns = [0,1,2,..,max_bits - 1]
@@ -101,14 +102,14 @@ void combs(std::vector<std::vector<size_t>>& cs, const std::vector<size_t>& ss,
 }
 
 syndrome_table build_syn_table(const matrix& check_matrix,
-                               const uint64_t width,
-                               const uint64_t max_errors)
+                               const size_t width,
+                               const size_t max_errors)
 {
-    uint64_t n = width;
+    size_t n = width;
 
     syndrome_table s_table;
     std::vector<code_word> errors = words_with_at_most_n_bits(max_errors, n);
-    for (uint64_t i = 0; i < errors.size(); ++i)
+    for (size_t i = 0; i < errors.size(); ++i)
     {
         const code_word err = errors[i];
         const code_word check = check_symbol(err, check_matrix);
