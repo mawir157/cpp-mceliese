@@ -31,7 +31,6 @@ std::vector<code_word> hackLinearComb(const std::vector<code_word>& M,
             scrambled.push_back(plain);
         }
     }
-    std::cout << std::endl;
     return scrambled;
 }
 

@@ -52,14 +52,6 @@ size_t row_weight(const code_word& r)
 
 void print_codeword(code_word r, const size_t n, const bool new_line)
 {
-    // std::vector<code_word> bin;
-    // for (size_t i = 0; i < n; ++i)
-    // {
-    //     bin.push_back(r & BS1);
-    //     r >>= 1;
-    // }
-    // for (size_t i = 1; i <= n; ++i)
-    //     std::cout << bin[n - i];
     std::cout << r;
 
     if (new_line)
@@ -219,11 +211,13 @@ void recursively_build(matrix rows,
 
 std::vector<matrix> all(const uint64_t n, const bool verbose)
 {
-    const code_word max = (1 << n) - 1;
+    code_word max = 1;
+    max <<= n;
+    // max -= 1;
     code_word mask = ((n+1) & 1); // 1 or 0.
     std::vector<matrix> matrices;
 
-    while (mask.to_ullong() < max.to_ullong())
+    while (mask.to_ullong() < max.to_ullong() - 1)
     {
         code_word seed = max ^ mask;
         if (verbose)
@@ -248,7 +242,8 @@ std::vector<matrix> all(const uint64_t n, const bool verbose)
 matrix find(const uint64_t n, const uint64_t bits)
 {
     matrix m;
-    const unsigned long long max = (1 << bits);
+    unsigned long long max = 1;
+    max <<= bits;
     while(m.size() < n)
     {
         // TODO: this needs to be done properly

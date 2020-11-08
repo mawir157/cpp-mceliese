@@ -14,7 +14,8 @@ void prepend_identity(matrix& rows, const size_t n_bits)
 void append_identity(matrix& rows, const size_t n_bits)
 {
     size_t shift = n_bits - 1;
-    code_word prefix = (1 << shift);
+    code_word prefix = 1;
+    prefix <<= shift;
     for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
     {
         rows[i] <<= (shift + 1);

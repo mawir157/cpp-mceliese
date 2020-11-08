@@ -60,7 +60,7 @@ code_word LinearCode::decode_symbol(const code_word r) const
     const code_word check = check_symbol(r, mv_check);
     if (BS0 == check)
         return (r >> mn_code_width);
-std::cout << check << std::endl;
+
     const code_word syndrome = mm_syndromes.at(check);
     code_word temp = row_add(r, syndrome);
 
@@ -124,7 +124,10 @@ void LinearCode::print() const
 matrix LinearCode::get_extra_bits() const
 {
     matrix x_bits;
-    unsigned long long mask = (1 << mn_code_width) - 1;
+    unsigned long long mask = 1;
+    mask <<= mn_code_width;
+    mask -= 1;
+
     code_word cw_mask = mask;
     for (size_t i = 0; i < mv_generator.size(); ++i)
         x_bits.push_back(mv_generator[i] & cw_mask);
