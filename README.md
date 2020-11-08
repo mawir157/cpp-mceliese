@@ -7,7 +7,7 @@ make
 
 ## Generate public and private keys
 ```
-./mceliese -g width extra_bits
+./mceliese -g dim extra_bits
 ```
 where 
  * `dim` is the number of bits in each plaintext symbol
