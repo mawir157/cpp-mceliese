@@ -1,27 +1,30 @@
 #include "encode.h"
 
-void prepend_identity(matrix& rows, const uint64_t n_bits)
+void prepend_identity(matrix& rows, const size_t n_bits)
 {
-    code_word prefix = (1 << (rows.size() + n_bits - 1));
-    for (uint64_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
-        rows[i] += prefix;
+    // have to do this in two steps since literal 1 is 32-bit
+    code_word prefix = 1;
+    prefix <<= (rows.size() + n_bits - 1);
+    for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
+        rows[i] |= prefix;
 
     return;
 }
 
-void append_identity(matrix& rows, const uint64_t n_bits)
+void append_identity(matrix& rows, const size_t n_bits)
 {
-    uint64_t shift = n_bits - 1;
-    code_word prefix = (1 << shift);
-    for (uint64_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
+    size_t shift = n_bits - 1;
+    code_word prefix = 1;
+    prefix <<= shift;
+    for (size_t i = 0;  i < rows.size(); ++i, prefix >>= 1)
     {
         rows[i] <<= (shift + 1);
-        rows[i] += prefix;
+        rows[i] |= prefix;
     }
     return;
 }
 
-matrix transpose(const matrix& m, const uint64_t n_bits)
+matrix transpose(const matrix& m, const size_t n_bits)
 {
     matrix tp;
     for (size_t i = 0; i < n_bits; ++i)
@@ -30,7 +33,7 @@ matrix transpose(const matrix& m, const uint64_t n_bits)
         for (size_t j = 0; j < m.size(); ++j)
         {
             wd <<= 1;
-            wd += ((m[j] >> i) & 1);
+            wd |= ((m[j] >> i) & BS1);
         }
         tp.push_back(wd);
     }
@@ -43,11 +46,11 @@ code_word check_symbol(const code_word r, const matrix& check_code)
 {
     code_word cipher = r;
     code_word check = 0;
-    for (code_word i = 0; i < check_code.size(); ++i)
+    for (size_t i = 0; i < check_code.size(); ++i)
     {
         check <<= 1;
         code_word dot = row_dot(cipher, check_code[i]);
-        check += dot;
+        check |= dot;
     }
     return check;
 }
@@ -62,9 +65,8 @@ std::vector<code_word> check_message(const std::vector<code_word>& message,
     return checktext;
 }
 
-// this is horribly inefficient - can redo in a clever way
-std::vector<code_word> words_with_at_most_n_bits(const uint64_t n,
-                                                 const uint64_t max_bits)
+std::vector<code_word> words_with_at_most_n_bits(const size_t n,
+                                                 const size_t max_bits)
 {
     std::vector<code_word> words;
     std::vector<size_t> ns; // ns = [0,1,2,..,max_bits - 1]
@@ -101,14 +103,14 @@ void combs(std::vector<std::vector<size_t>>& cs, const std::vector<size_t>& ss,
 }
 
 syndrome_table build_syn_table(const matrix& check_matrix,
-                               const uint64_t width,
-                               const uint64_t max_errors)
+                               const size_t width,
+                               const size_t max_errors)
 {
-    uint64_t n = width;
+    size_t n = width;
 
-    std::map<code_word, code_word> s_table;
+    syndrome_table s_table;
     std::vector<code_word> errors = words_with_at_most_n_bits(max_errors, n);
-    for (uint64_t i = 0; i < errors.size(); ++i)
+    for (size_t i = 0; i < errors.size(); ++i)
     {
         const code_word err = errors[i];
         const code_word check = check_symbol(err, check_matrix);

@@ -24,14 +24,13 @@ std::vector<code_word> hackLinearComb(const std::vector<code_word>& M,
             {
                 plain <<= 1;
                 temp ^= get_bit(cipher, j);
-                plain += (temp ? 1 : 0);
+                plain |= (temp ? 1 : 0);
             }
 
             plain = reverse(plain, bits);
             scrambled.push_back(plain);
         }
     }
-    std::cout << std::endl;
     return scrambled;
 }
 
@@ -210,8 +209,7 @@ void SaveKeys(const McEliesePrivate& privKey,
     const matrix R = pubKey.get_gen_mat();
     for (size_t i = 0; i < R.size(); ++i)
     {
-       public_file << R[i]
-                    << (i + 1 == R.size() ? "\n" : ",");
+       public_file << R[i] << (i + 1 == R.size() ? "\n" : ",");
     }
     public_file.close();
 
@@ -227,8 +225,7 @@ void SaveKeys(const McEliesePrivate& privKey,
 
     for (size_t i = 0; i < M.size(); ++i)
     {
-       private_file << M[i]
-                   << (i + 1 == M.size() ? "\n" : ",");
+       private_file << M[i] << (i + 1 == M.size() ? "\n" : ",");
     }
     private_file << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+"
                 << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;
@@ -261,15 +258,14 @@ McEliesePrivate ReadPrivateKey(const std::string& file_path)
     getline(data_file, line);
     int from = 0;
     int comma = line.find(",", from);
-    int value = std::stoi(line.substr(from, comma - from));
-    G.push_back(value);
+
+    G.emplace_back(line.substr(from, comma - from));
     while (comma > 0)
     {
         from = comma + 1;
         comma = line.find(",", from);
 
-        value = std::stoi(line.substr(from, comma - from));
-        G.push_back(value);
+        G.emplace_back(line.substr(from, comma - from));
     }
 
     LinearCode lc = LinearCode(G, w);
@@ -279,11 +275,11 @@ McEliesePrivate ReadPrivateKey(const std::string& file_path)
     from    = 0;
     int bar = line.find("|", from);
     comma   = line.find(",", from);
-    int value2;
+    int value1, value2;
 
-    value = std::stoi(line.substr(from, bar - from));
+    value1 = std::stoi(line.substr(from, bar - from));
     value2 = std::stoi(line.substr(bar+1, comma - bar + 1));
-    permUnit p(value, value2);
+    permUnit p(value1, value2);
     P.push_back(p);
     while (comma > 0)
     {
@@ -291,10 +287,10 @@ McEliesePrivate ReadPrivateKey(const std::string& file_path)
         comma = line.find(",", from);
         bar = line.find("|", from);
 
-        value = std::stoi(line.substr(from, bar - from));
+        value1 = std::stoi(line.substr(from, bar - from));
         value2 = std::stoi(line.substr(bar+1, comma - bar + 1));
 
-        permUnit p(value, value2);
+        permUnit p(value1, value2);
         P.push_back(p);
     }
 
@@ -318,17 +314,14 @@ McEliesePublic ReadPublicKey(const std::string& file_path)
     getline(data_file, line);
     int from = 0;
     int comma = line.find(",", from);
-    int value = std::stoi(line.substr(from, comma - from));
-    G.push_back(value);;
+    G.emplace_back(line.substr(from, comma - from));
     while (comma > 0)
     {
         from = comma + 1;
         comma = line.find(",", from);
 
-        value = std::stoi(line.substr(from, comma - from));
-        G.push_back(value);
+        G.emplace_back(line.substr(from, comma - from));
     }
-    // size_t w = G.size();
     LinearCode lc(G, w);
  
     lc.set_generator(G);
@@ -337,7 +330,8 @@ McEliesePublic ReadPublicKey(const std::string& file_path)
     return lc;
 }
 
-std::vector<code_word> ReadCSV(const std::string& file_path)
+std::vector<code_word> ReadCSV(const std::string& file_path,
+                               const bool bin)
 {
     std::string line;
     std::ifstream data_file(file_path);
@@ -347,15 +341,31 @@ std::vector<code_word> ReadCSV(const std::string& file_path)
     getline(data_file, line);
     int from = 0;
     int comma = line.find(",", from);
-    int value = std::stoi(line.substr(from, comma - from));
-    message.push_back(value);;
+    int value;
+
+    if (!bin)
+    {
+        value = std::stoi(line.substr(from, comma - from));
+        message.push_back(value);
+    }
+    else
+    {
+       message.emplace_back(line.substr(from, comma - from)); 
+    }
     while (comma > 0)
     {
         from = comma + 1;
         comma = line.find(",", from);
 
-        value = std::stoi(line.substr(from, comma - from));
-        message.push_back(value);
+        if (!bin)
+        {
+            value = std::stoi(line.substr(from, comma - from));
+            message.push_back(value);
+        }
+        else
+        {
+           message.emplace_back(line.substr(from, comma - from)); 
+        }
     }
 
     return message;

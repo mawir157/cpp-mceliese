@@ -40,7 +40,7 @@ code_word LinearCode::encode_symbol(const code_word r) const
     code_word plain = reverse(r, code_word_size());
     code_word cipher = 0;
     for (size_t i = 0; i < code_word_size(); ++i, plain >>= 1)
-        if (1 == (plain & 1))
+        if (BS1 == (plain & BS1))
             cipher = row_add(cipher, mv_generator[i]);
 
     return cipher;
@@ -58,10 +58,9 @@ std::vector<code_word> LinearCode::encode_message(const std::vector<code_word>& 
 code_word LinearCode::decode_symbol(const code_word r) const
 {
     const code_word check = check_symbol(r, mv_check);
-    if (0 == check)
+    if (BS0 == check)
         return (r >> mn_code_width);
-print_codeword(r, mn_code_width + code_word_size());
-print_codeword(check, mn_code_width);
+
     const code_word syndrome = mm_syndromes.at(check);
     code_word temp = row_add(r, syndrome);
 
@@ -85,11 +84,12 @@ std::vector<code_word> LinearCode::decode_message(const std::vector<code_word>& 
 
 size_t LinearCode::calc_minimum_weight() const
 {
-    code_word max_word = 1;
+    unsigned long long max_word = 1;
     max_word <<= code_word_size();
     size_t min_wt = 1000;
-    for (code_word wd = 1; wd < max_word; ++wd)
+    for (unsigned long long wi = 1; wi < max_word; ++wi)
     {
+        const code_word wd = wi;
         const code_word test = encode_symbol(wd);
         const size_t test_wt = row_weight(test);
 
@@ -124,9 +124,13 @@ void LinearCode::print() const
 matrix LinearCode::get_extra_bits() const
 {
     matrix x_bits;
-    code_word mask = 1 << mn_code_width;
+    unsigned long long mask = 1;
+    mask <<= mn_code_width;
+    mask -= 1;
+
+    code_word cw_mask = mask;
     for (size_t i = 0; i < mv_generator.size(); ++i)
-        x_bits.push_back(mv_generator[i] % mask);
+        x_bits.push_back(mv_generator[i] & cw_mask);
     
     return x_bits;
 }

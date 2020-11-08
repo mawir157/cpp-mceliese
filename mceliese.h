@@ -1,6 +1,6 @@
 #include "linearcode.h"
 
-typedef std::tuple<uint64_t, uint64_t> permUnit;
+typedef std::tuple<size_t, size_t> permUnit;
 typedef std::vector<permUnit> permn;
 typedef std::tuple<matrix, LinearCode, permn> McEliesePrivate;
 typedef LinearCode McEliesePublic;
@@ -28,7 +28,8 @@ void SaveKeys(const McEliesePrivate& privKey,
 
 McEliesePrivate ReadPrivateKey(const std::string& file_path);
 McEliesePublic ReadPublicKey(const std::string& file_path);
-std::vector<code_word> ReadCSV(const std::string& file_path);
+std::vector<code_word> ReadCSV(const std::string& file_path,
+	                             const bool bin=false);
 
 std::vector<code_word> McE_encypt_message(const McEliesePublic& pubKey,
                                           const std::vector<code_word>& message);

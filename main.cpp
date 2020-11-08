@@ -96,8 +96,9 @@ int main (int argc, char **argv)
 
         std::vector<matrix> mats = all(n_bits, false);
 
-        sort( mats.begin(), mats.end() );
-        mats.erase( unique( mats.begin(), mats.end() ), mats.end() );
+        // we will need to define a < operator for this to work
+        // sort( mats.begin(), mats.end() );
+        // mats.erase( unique( mats.begin(), mats.end() ), mats.end() );
         std::cout << "Found " << mats.size() << " " << n_bits << "-by-" << n_bits
                   << " orthognal matrices over F2" << std::endl;
 
@@ -117,6 +118,9 @@ int main (int argc, char **argv)
 
         SaveKeys(priv, pub, ".");
 
+        LinearCode   G =  std::get<1>(priv);
+        G.print();
+
         return 0;     
     }
 
@@ -134,12 +138,12 @@ int main (int argc, char **argv)
     if (RunMode::decode_message == mode)
     {
         McEliesePrivate covert = ReadPrivateKey(key_file);
-        std::vector<code_word> message = ReadCSV(message_file);
+        std::vector<code_word> message = ReadCSV(message_file, true);
 
         std::vector<code_word> plaintext = McE_decypt_message(covert, message);
 
         for (size_t i = 0; i < plaintext.size(); ++i)
-            std::cout << plaintext[i] << (i + 1 == plaintext.size() ? "\n" : ",");
+            std::cout << plaintext[i].to_ullong() << (i + 1 == plaintext.size() ? "\n" : ",");
     }
 
     return 0;

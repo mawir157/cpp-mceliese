@@ -12,7 +12,7 @@ inline bool operator==(const matrix& lhs, const matrix& rhs)
     return true;
 }
 
-code_word row_dot(const code_word r1, const code_word r2)
+size_t row_dot(const code_word r1, const code_word r2)
 {
     return row_weight(r1 & r2) % 2;
 }
@@ -45,27 +45,14 @@ std::vector<size_t> column_weights(const matrix& rows)
     return cols;
 }
 
-size_t row_weight(code_word r)
+size_t row_weight(const code_word& r)
 {
-    size_t wt = 0;
-    while (r > 0)
-    {
-        wt += (r & 1);
-        r >>= 1;
-    }
-    return wt;
+    return r.count();
 }
 
 void print_codeword(code_word r, const size_t n, const bool new_line)
 {
-    std::vector<code_word> bin;
-    for (size_t i = 0; i < n; ++i)
-    {
-        bin.push_back(r & 1);
-        r >>= 1;
-    }
-    for (size_t i = 1; i <= n; ++i)
-        std::cout << bin[n - i];
+    std::cout << r;
 
     if (new_line)
         std::cout << std::endl;
@@ -96,7 +83,8 @@ bool order_by_weight(const code_word r1, const code_word r2)
     if (wt1 > wt2)
         return false;
 
-    return (r1 > r2);
+    // return (r1 > r2);
+    return (r1.to_ullong() > r2.to_ullong());
 }
 
 code_word swap_bits(const code_word r, const size_t c1, const size_t c2)
@@ -122,7 +110,7 @@ code_word reverse(const code_word r, const size_t width)
     for (size_t i = 0; i < width; ++i)
     {
         p <<= 1;
-        p += (get_bit(r, i) ? 1 : 0);
+        p |= (get_bit(r, i) ? 1 : 0);
     }
     return p;
 }
@@ -137,7 +125,7 @@ void swap_columns(matrix& m, const size_t c1, const size_t c2)
 
 bool get_bit(const code_word r, const size_t n)
 {
-    return (1 == ((r >> n) & 1));
+    return r[n];
 }
 
 code_word set_bit(const code_word r, const size_t n, const bool bit)
@@ -195,15 +183,16 @@ void recursively_build(matrix rows,
     }
 
 
-    for (code_word rw = rows.back() - 1; rw > 0; --rw)
+    for (unsigned long long ri = rows.back().to_ullong() - 1; ri > 0; --ri)
     {
+        code_word rw = ri;
         if (0 == (row_weight(rw) & 1))
             continue;
 
         bool ok = true;
         for (uint64_t i = 0; i < rows.size(); ++i)
         {
-            if (0 != (row_dot(rows[i], rw) & 1))
+            if (1 == row_dot(rows[i], rw))
             {
                 ok = false;
                 break;
@@ -222,11 +211,13 @@ void recursively_build(matrix rows,
 
 std::vector<matrix> all(const uint64_t n, const bool verbose)
 {
-    const code_word max = (1 << n) - 1;
+    code_word max = 1;
+    max <<= n;
+    // max -= 1;
     code_word mask = ((n+1) & 1); // 1 or 0.
     std::vector<matrix> matrices;
 
-    while (mask < max)
+    while (mask.to_ullong() < max.to_ullong() - 1)
     {
         code_word seed = max ^ mask;
         if (verbose)
@@ -236,8 +227,9 @@ std::vector<matrix> all(const uint64_t n, const bool verbose)
             std::cout << std::endl;
         }
 
+        // shift up by 2 bits then set the new bit to 1.
         mask <<= 2;
-        mask += 3;
+        mask |= ((BS1 << 1) & BS1);
 
         matrix test = {seed}; 
         recursively_build(test, n-1, max, matrices, verbose);
@@ -250,15 +242,17 @@ std::vector<matrix> all(const uint64_t n, const bool verbose)
 matrix find(const uint64_t n, const uint64_t bits)
 {
     matrix m;
-    const code_word max = (1 << bits);
+    unsigned long long max = 1;
+    max <<= bits;
     while(m.size() < n)
     {
-        code_word c = rand() % max;
+        // TODO: this needs to be done properly
+        const code_word c = rand() % max;
         bool ok = true;
 
         for (uint64_t i = 0; i < m.size(); ++i)
         {
-            if (0 != (row_dot(m[i], c) & 1))
+            if (1 == row_dot(m[i], c))
             {
                 ok = false;
                 break;
