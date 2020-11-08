@@ -27,7 +27,7 @@ where `public.mce` is the public key generated above.
 
 ## Decrypt data
 ```
-./main -d ./encrypted.txt private.mce >> plain.txt
+./mceliese -d ./encrypted.txt private.mce >> plain.txt
 ```
 where `private.ce` is the private key generated above.
 
