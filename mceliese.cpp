@@ -17,13 +17,13 @@ std::vector<code_word> hackLinearComb(const std::vector<code_word>& M,
         for (size_t i = 0; i < M.size(); ++i)
         {
             code_word cipher = M[i];
-            bool temp = get_bit(cipher, 0);
+            bool temp = cipher[0];
             code_word plain = (temp ? 1 : 0);
 
             for (size_t j = 1; j < bits; ++j)
             {
                 plain <<= 1;
-                temp ^= get_bit(cipher, j);
+                temp ^= cipher[j];
                 plain |= (temp ? 1 : 0);
             }
 

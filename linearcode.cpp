@@ -103,11 +103,11 @@ size_t LinearCode::calc_minimum_weight() const
 void LinearCode::print() const
 {
     std::cout << "Generating matrix:" << std::endl;
-    print_matrix(mv_generator, code_word_size() + mn_code_width);
+    print_matrix(mv_generator);
     if (mb_can_decode)
     {
         std::cout << "Checking matrix:" << std::endl;
-        print_matrix(mv_check, code_word_size() + mn_code_width);
+        print_matrix(mv_check);
     }
     else
         std::cout << "Cannot decode" << std::endl;

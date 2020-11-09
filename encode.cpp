@@ -127,9 +127,9 @@ void print_syn_table(const syndrome_table& st, const size_t n_bits,
     for (syndrome_table::const_iterator it = st.begin(); it != st.end(); ++it)
     {
         std::cout << "[";
-        print_codeword(it->first, n_bits, false);
+        print_codeword(it->first, false);
         std::cout << " => ";
-        print_codeword(it->second, n_words + n_bits, false);
+        print_codeword(it->second, false);
         std::cout << "]" << std::endl;
     }
 }
@@ -141,7 +141,7 @@ code_word add_upto_n_error(const code_word& wd, const uint64_t width,
     for (uint64_t i = 0; i < n; ++i)
     {
         const uint64_t pos = rand() % width;
-        new_word = flip_bit(new_word, pos);
+        new_word.flip(pos);
     }
     return new_word;
 }
