@@ -1,6 +1,6 @@
 #include "linearcode.h"
 
-LinearCode::LinearCode(const matrix& M, const size_t width) : 
+LinearCode::LinearCode(const matrix& M, const size_t width) :
     mn_code_width(width), mb_can_decode(true)
 {
     mv_generator = M;
@@ -12,7 +12,7 @@ LinearCode::LinearCode(const matrix& M, const size_t width) :
 
     size_t min_weight = calc_minimum_weight();
     mn_max_errors = (min_weight <= 2) ? 0 : ((min_weight / 2) - 1);
-    mm_syndromes = build_syn_table(mv_check, 
+    mm_syndromes = build_syn_table(mv_check,
                                    M.size() + width,
                                    mn_max_errors);
 }
@@ -103,11 +103,11 @@ size_t LinearCode::calc_minimum_weight() const
 void LinearCode::print() const
 {
     std::cout << "Generating matrix:" << std::endl;
-    print_matrix(mv_generator, code_word_size() + mn_code_width);
+    print_matrix(mv_generator);
     if (mb_can_decode)
     {
         std::cout << "Checking matrix:" << std::endl;
-        print_matrix(mv_check, code_word_size() + mn_code_width);
+        print_matrix(mv_check);
     }
     else
         std::cout << "Cannot decode" << std::endl;
@@ -131,6 +131,6 @@ matrix LinearCode::get_extra_bits() const
     code_word cw_mask = mask;
     for (size_t i = 0; i < mv_generator.size(); ++i)
         x_bits.push_back(mv_generator[i] & cw_mask);
-    
+
     return x_bits;
 }
