@@ -68,7 +68,7 @@ void applyPermn(LinearCode& lc, const permn& perm, const bool rev)
     else
     {
         for (uint64_t i = 0; i < perm.size(); ++i)
-            applySwap(lc, perm[i]);        
+            applySwap(lc, perm[i]);
     }
 
     lc.set_decode_flag(false);
@@ -229,7 +229,7 @@ void SaveKeys(const McEliesePrivate& privKey,
     }
     private_file << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+"
                 << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;
-    
+
     for (size_t i = 0; i < P.size(); ++i)
     {
         const uint64_t c1 = std::get<0>(P[i]);
@@ -323,7 +323,7 @@ McEliesePublic ReadPublicKey(const std::string& file_path)
         G.emplace_back(line.substr(from, comma - from));
     }
     LinearCode lc(G, w);
- 
+
     lc.set_generator(G);
     lc.set_max_errors(errs);
 
@@ -350,7 +350,7 @@ std::vector<code_word> ReadCSV(const std::string& file_path,
     }
     else
     {
-       message.emplace_back(line.substr(from, comma - from)); 
+       message.emplace_back(line.substr(from, comma - from));
     }
     while (comma > 0)
     {
@@ -364,7 +364,7 @@ std::vector<code_word> ReadCSV(const std::string& file_path,
         }
         else
         {
-           message.emplace_back(line.substr(from, comma - from)); 
+           message.emplace_back(line.substr(from, comma - from));
         }
     }
 

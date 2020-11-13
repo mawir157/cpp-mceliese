@@ -5,16 +5,14 @@
 #include "mceliese.h"
 
 // Allow us to sort martices
-bool mat_compare(const matrix &b1, const matrix &b2)
+bool mat_compare(const matrix& b1, const matrix& b2)
     {
         if (b1.size() != b2.size())
         {
-            std::cout << "Fuck you! " 
+            std::cout << "Fuck you! "
                       << b1.size() << "," << b2.size()
                       << std::endl;
-            print_matrix(b1);
-            std::cout << "================\n";
-            print_matrix(b2);
+            return false;
         }
 
         for (size_t i = 0; i < b1.size(); ++i)
@@ -26,7 +24,7 @@ bool mat_compare(const matrix &b1, const matrix &b2)
                 return false;
         }
 
-        return true;
+        return false;
 }
 
 
@@ -53,7 +51,7 @@ int main (int argc, char **argv)
         {
             if (argc != 3)
             {
-                std::cout << "[Usage] ./mceliese -o [n_dims]" 
+                std::cout << "[Usage] ./mceliese -o [n_dims]"
                           << std::endl;
                 return -1;
             }
@@ -65,7 +63,7 @@ int main (int argc, char **argv)
         {
             if (argc != 4)
             {
-                std::cout << "[Usage] ./mceliese -g [n_dims] [n_extra_bits]" 
+                std::cout << "[Usage] ./mceliese -g [n_dims] [n_extra_bits]"
                           << std::endl;
                 return -1;
             }
@@ -78,7 +76,7 @@ int main (int argc, char **argv)
         {
             if (argc != 4)
             {
-                std::cout << "[Usage] ./mceliese -e [message filepath] [public key file]" 
+                std::cout << "[Usage] ./mceliese -e [message filepath] [public key file]"
                           << std::endl;
                 return -1;
             }
@@ -91,7 +89,7 @@ int main (int argc, char **argv)
         {
             if (argc != 4)
             {
-                std::cout << "[Usage] ./mceliese -D [message filepath] [private key file]" 
+                std::cout << "[Usage] ./mceliese -D [message filepath] [private key file]"
                           << std::endl;
                 return -1;
             }
@@ -121,15 +119,8 @@ int main (int argc, char **argv)
         clock_t startTime = clock();
 
         std::vector<matrix> mats = all(n_bits, false);
+        std::cout << "+++ " << mats.size() << std::endl;
 
-        for (size_t i = 0; i < mats.size(); ++i)
-            std::cout << mats[i].size() << ", ";
-
-        std::cout << std::endl;
-
-        print_matrix(*mats.begin());
-
-        // we will need to define a < operator for this to work
         std::sort( mats.begin(), mats.end(), mat_compare );
         mats.erase( std::unique( mats.begin(), mats.end() ), mats.end() );
         std::cout << "Found " << mats.size() << " " << n_bits << "-by-" << n_bits
@@ -138,8 +129,10 @@ int main (int argc, char **argv)
         for (size_t i = 0; i < mats.size(); ++i)
         {
             prepend_identity(mats[i], n_bits);
-            print_matrix(mats[i]);
+
             std::map<size_t, size_t> freq_table = sig_table(mats[i]);
+
+            print_matrix(basis_span(mats[i]));
 
             for (std::map<size_t, size_t>::iterator i=freq_table.begin();
                                                     i != freq_table.end();
@@ -150,14 +143,11 @@ int main (int argc, char **argv)
             std::cout << std::endl;
         }
 
-        // print_matrix(v_space);
-
-
         std::cout << "Time to run: "
                   << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
                   << " seconds." << std::endl;
-
-        return 0;       
+////////////////////////////////////////////////////////////////////////////////
+        return 0;
     }
 
     if (RunMode::generate_keys == mode)
@@ -172,7 +162,7 @@ int main (int argc, char **argv)
         LinearCode   G =  std::get<1>(priv);
         G.print();
 
-        return 0;     
+        return 0;
     }
 
     if (RunMode::encode_message == mode)
@@ -181,7 +171,7 @@ int main (int argc, char **argv)
         std::vector<code_word> message = ReadCSV(message_file);
 
         std::vector<code_word> ciphertext = McE_encypt_message(overt, message);
-        
+
         for (size_t i = 0; i < ciphertext.size(); ++i)
             std::cout << ciphertext[i] << (i + 1 == ciphertext.size() ? "\n" : ",");
     }

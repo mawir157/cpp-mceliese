@@ -24,24 +24,6 @@ void append_identity(matrix& rows, const size_t n_bits)
     return;
 }
 
-matrix transpose(const matrix& m, const size_t n_bits)
-{
-    matrix tp;
-    for (size_t i = 0; i < n_bits; ++i)
-    {
-        code_word wd = 0;
-        for (size_t j = 0; j < m.size(); ++j)
-        {
-            wd <<= 1;
-            wd |= ((m[j] >> i) & BS1);
-        }
-        tp.push_back(wd);
-    }
-    std::reverse(tp.begin(), tp.end()); 
-    return tp;
-}
-
-
 code_word check_symbol(const code_word r, const matrix& check_code)
 {
     code_word cipher = r;
@@ -63,43 +45,6 @@ std::vector<code_word> check_message(const std::vector<code_word>& message,
         checktext.push_back(check_symbol(message[i], check_code));
 
     return checktext;
-}
-
-std::vector<code_word> words_with_at_most_n_bits(const size_t n,
-                                                 const size_t max_bits)
-{
-    std::vector<code_word> words;
-    std::vector<size_t> ns; // ns = [0,1,2,..,max_bits - 1]
-    for(size_t i = 0; i < max_bits; ++i)
-        ns.push_back(i);
-
-    for (size_t m = 1; m <= n; ++m)
-    {
-        std::vector<std::vector<size_t>> cs;
-        std::vector<size_t> comb;
-        combs(cs, ns, comb, 0, m);
-
-        for (size_t i = 0; i < cs.size(); ++i)
-            words.push_back(vec_to_code_word(cs[i]));
-    }
-    return words;
-}
-
-void combs(std::vector<std::vector<size_t>>& cs, const std::vector<size_t>& ss,
-           std::vector<size_t>& combination,
-           const size_t offset, const size_t k) {
-  if (k == 0)
-  {
-    cs.push_back(combination);
-    return;
-  }
-  for (size_t i = offset; i <= ss.size() - k; ++i)
-  {
-    combination.push_back(ss[i]);
-    combs(cs, ss, combination, i+1, k-1);
-    combination.pop_back();
-  }
-  return;
 }
 
 syndrome_table build_syn_table(const matrix& check_matrix,

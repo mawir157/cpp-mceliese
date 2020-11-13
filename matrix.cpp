@@ -4,7 +4,7 @@ inline bool operator==(const matrix& lhs, const matrix& rhs)
 {
     if (lhs.size() != rhs.size())
         return false;
-    
+
     for (size_t i = 0; i < lhs.size(); ++i)
         if (lhs[i] != rhs[i])
             return false;
@@ -31,13 +31,13 @@ size_t col_weight(const matrix& rows, const size_t c1)
     return total;
 }
 
-std::vector<size_t> column_weights(const matrix& rows)
+std::vector<size_t> column_weights(const matrix& rows, const size_t n_bits)
 {
-    std::vector<size_t> cols(rows.size());
+    std::vector<size_t> cols(n_bits);
 
     for (size_t i=0; i < rows.size(); ++i)
     {
-        for (size_t j=0; j < rows.size(); ++j)
+        for (size_t j=0; j < n_bits; ++j)
         {
             cols[j] += (rows[i][j] ? 1 : 0);
         }
@@ -45,9 +45,46 @@ std::vector<size_t> column_weights(const matrix& rows)
     return cols;
 }
 
+bool col_weight_acc(const matrix& rows, const size_t n_bits)
+{
+    const matrix trs = transpose(rows, n_bits);
+
+    for (size_t i = 1; i < trs.size(); ++i)
+        if (row_weight(trs[i-1]) < row_weight(trs[i]))
+            return false;
+
+    return true;
+}
+
 size_t row_weight(const code_word& r)
 {
     return r.count();
+}
+
+bool row_weight_dec(const matrix& rows)
+{
+    for (size_t i = 1; i < rows.size(); ++i)
+        if (row_weight(rows[i-1]) > row_weight(rows[i]))
+            return false;
+
+    return true;
+}
+
+matrix transpose(const matrix& m, const size_t n_bits)
+{
+    matrix tp;
+    for (size_t i = 0; i < n_bits; ++i)
+    {
+        code_word wd = 0;
+        for (size_t j = 0; j < m.size(); ++j)
+        {
+            wd <<= 1;
+            wd |= ((m[j] >> i) & BS1);
+        }
+        tp.push_back(wd);
+    }
+    std::reverse(tp.begin(), tp.end());
+    return tp;
 }
 
 void print_codeword(code_word r, const bool new_line)
@@ -70,28 +107,14 @@ void print_matrix(const matrix rows)
     return;
 }
 
-bool order_by_weight(const code_word r1, const code_word r2)
-{
-    const size_t wt1 = row_weight(r1);
-    const size_t wt2 = row_weight(r2);
-    if (wt1 < wt2)
-        return true;
-    
-    if (wt1 > wt2)
-        return false;
-
-    // return (r1 > r2);
-    return (r1.to_ullong() > r2.to_ullong());
-}
-
 code_word swap_bits(const code_word r, const size_t c1, const size_t c2)
 {
-    const code_word b1 = (r[c1] ? 1 : 0); 
-    const code_word b2 = (r[c2] ? 1 : 0); 
-    code_word x = (b1 ^ b2); 
-    x = (x << c1) | (x << c2); 
+    const code_word b1 = (r[c1] ? 1 : 0);
+    const code_word b2 = (r[c2] ? 1 : 0);
+    code_word x = (b1 ^ b2);
+    x = (x << c1) | (x << c2);
 
-    return (r ^ x); 
+    return (r ^ x);
 }
 
 code_word reverse(const code_word r, const size_t width)
@@ -122,22 +145,28 @@ code_word vec_to_code_word(const std::vector<size_t> v)
     return cw;
 }
 
-void order_columns(matrix& m)
+bool row_order(const code_word& lhs, const code_word& rhs)
 {
-    std::vector<size_t> col_wts = column_weights(m);
-    for (size_t i = 1; i < m.size(); ++i)
-    {
-        for (size_t j = 1; j < m.size(); ++j)
-        {
-            if (col_wts[j-1] < col_wts[j])
-            {
-                swap_columns(m, j-1, j);
+    if (row_weight(lhs) != row_weight(rhs))
+        return row_weight(lhs) < row_weight(rhs);
 
-                std::iter_swap(col_wts.begin() + (j-1), col_wts.begin() + j);
-            }
-        }
+    return lhs.to_ullong() > rhs.to_ullong();
+}
+
+matrix canonise(const matrix& cw)
+{
+    matrix canon = cw;
+    const size_t n = canon.size();
+
+    for (size_t i = 0; i < 2*n; ++i)
+    {
+        canon = transpose(canon, n);
+        std::sort( canon.begin(), canon.end(), row_order);
+
+        canon = transpose(canon, n);
+        std::sort( canon.begin(), canon.end(), row_order);
     }
-    return;
+    return canon;
 }
 
 void recursively_build(matrix rows,
@@ -148,14 +177,12 @@ void recursively_build(matrix rows,
 {
     if (depth == 0)
     {
-        std::sort(rows.begin(), rows.end(), order_by_weight);
-        order_columns(rows);
+        rows = canonise(rows);
         if (verbose)
             print_matrix(rows);
         matrices.push_back(rows);
         return;
     }
-
 
     for (unsigned long long ri = rows.back().to_ullong() - 1; ri > 0; --ri)
     {
@@ -183,38 +210,92 @@ void recursively_build(matrix rows,
     return;
 }
 
+void recursively_build_new(matrix rows,
+                           size_t depth,
+                           const size_t cur_index,
+                           const std::vector<code_word> odd_words,
+                           std::vector<matrix>& matrices,
+                           const bool verbose)
+{
+    if (depth == 0)
+    {
+        rows = canonise(rows);
+        if (verbose)
+            print_matrix(rows);
+        matrices.push_back(rows);
+        return;
+    }
+
+    const size_t last_row_wt = row_weight(rows.back());
+
+    for (size_t i = cur_index + 1; i < odd_words.size(); ++i)
+    {
+        code_word rw = odd_words[i];
+
+        bool ok = (row_weight(rw) >= last_row_wt);
+
+        if (ok)
+        {
+            for (uint64_t j = 0; j < rows.size(); ++j)
+            {
+                if (1 == row_dot(rows[j], rw))
+                {
+                    ok = false;
+                    break;
+                }
+            }
+        }
+
+        if (ok)
+        {
+            matrix r_copy = rows;
+            r_copy.push_back(rw);
+            recursively_build_new(r_copy, depth - 1, i, odd_words,
+                                  matrices, verbose);
+        }
+    }
+    return;
+}
+
 std::vector<matrix> all(const uint64_t n, const bool verbose)
 {
+    std::vector<matrix> matrices;
+    std::vector<size_t> breaks;
+
+    std::vector<code_word> odd_words = words_with_odd_weight(n, breaks);
+
+    // up to permurations all first lines are equivalent upto weight
     code_word max = 0;
     for (size_t i = 0; i < n; ++i)
         max.set(i);
 
-    code_word mask = 0;
-    if (0 == (n % 2))
-        mask.set(0);
+    code_word first = 1;
 
-    std::vector<matrix> matrices;
-
-    while (mask.to_ullong() < max.to_ullong() - 1)
+    size_t block = 0;
+    while (first.to_ullong() + 1 < max.to_ullong())
     {
-        code_word seed = max ^ mask;
+clock_t startTime = clock();
+        matrix row_1 = { first };
         if (verbose)
-        { 
+        {
             std::cout << "First code_word: ";
-            print_codeword(seed, n);
+            print_matrix(row_1);
             std::cout << std::endl;
         }
 
-        // shift up by 2 bits then set the new bits to 1.
-        mask <<= 2;
-        // mask |= ((BS1 << 1) & BS1);
-        mask.set(0);
-        mask.set(1);
+        recursively_build_new(row_1, n - 1, breaks[block], odd_words,
+                              matrices, verbose);
 
-        matrix test = {seed}; 
-        recursively_build(test, n-1, max, matrices, verbose);
-        if (verbose)
-            std::cout << matrices.size() << std::endl;
+        // shift up by 2 bits then set the new bits to 1.
+        first <<= 2;
+        first.set(0);
+        first.set(1);
+
+std::cout << "["<< block << "] *****"
+          << " (" << matrices.size() << ") "
+          << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
+          << " seconds." << std::endl;
+        ++block;
     }
     return matrices;
 }
@@ -274,7 +355,6 @@ std::vector<size_t> v_space_sig(const std::vector<code_word>& generator)
     for (size_t i = 0; i < all_vectors.size(); ++i)
         sizes.push_back(row_weight(all_vectors[i]));
 
-    sort(sizes.begin(), sizes.end());
     return sizes;
 }
 
@@ -286,4 +366,63 @@ std::map<size_t, size_t> sig_table(const std::vector<code_word>& generator)
         f_table[counts[i]] += 1;
 
     return f_table;
+}
+
+std::vector<code_word> words_with_at_most_n_bits(const size_t n,
+                                                 const size_t max_bits)
+{
+    std::vector<code_word> words;
+    std::vector<size_t> ns; // ns = [0,1,2,..,max_bits - 1]
+    for(size_t i = 0; i < max_bits; ++i)
+        ns.push_back(i);
+
+    for (size_t m = 1; m <= n; ++m)
+    {
+        std::vector<std::vector<size_t>> cs;
+        std::vector<size_t> comb;
+        combs(cs, ns, comb, 0, m);
+
+        for (size_t i = 0; i < cs.size(); ++i)
+            words.push_back(vec_to_code_word(cs[i]));
+    }
+    return words;
+}
+
+std::vector<code_word> words_with_odd_weight(const size_t max_bits,
+                                             std::vector<size_t>& breaks)
+{
+    std::vector<code_word> words;
+    std::vector<size_t> ns; // ns = [0,1,2,..,max_bits - 1]
+    for(size_t i = 0; i < max_bits; ++i)
+        ns.push_back(i);
+
+    for (size_t m = 1; m <= max_bits; m += 2)
+    {
+        std::vector<std::vector<size_t>> cs;
+        std::vector<size_t> comb;
+        combs(cs, ns, comb, 0, m);
+
+        for (size_t i = 0; i < cs.size(); ++i)
+            words.push_back(vec_to_code_word(cs[i]));
+
+        breaks.push_back(breaks.size());
+    }
+    return words; 
+}
+
+void combs(std::vector<std::vector<size_t>>& cs, const std::vector<size_t>& ss,
+           std::vector<size_t>& combination,
+           const size_t offset, const size_t k) {
+  if (k == 0)
+  {
+    cs.push_back(combination);
+    return;
+  }
+  for (size_t i = offset; i <= ss.size() - k; ++i)
+  {
+    combination.push_back(ss[i]);
+    combs(cs, ss, combination, i+1, k-1);
+    combination.pop_back();
+  }
+  return;
 }
