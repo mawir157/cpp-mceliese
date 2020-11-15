@@ -80,7 +80,6 @@ std::vector<matrix> all(const uint64_t n, const bool verbose)
     size_t block = 0;
     while (first.to_ullong() + 1 < max.to_ullong())
     {
-clock_t startTime = clock();
         matrix row_1 = { first };
         if (verbose)
         {
@@ -97,10 +96,6 @@ clock_t startTime = clock();
         first.set(0);
         first.set(1);
 
-std::cout << "["<< block << "] *****"
-          << " (" << matrices.size() << ") "
-          << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
-          << " seconds." << std::endl;
         ++block;
     }
     return matrices;
@@ -123,6 +118,11 @@ std::vector<code_word> basis_span(const matrix& generator)
         }
         all_vectors.push_back(comb);
     }
+
+    std::sort(all_vectors.begin(), all_vectors.end(),
+              [](const code_word& c1, const code_word& c2)
+                 { return row_weight(c1) <  row_weight(c2); });
+
     return all_vectors;
 }
 

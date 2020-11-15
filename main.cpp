@@ -120,7 +120,7 @@ int main (int argc, char **argv)
         clock_t startTime = clock();
 
         std::vector<matrix> mats = all(n_bits, false);
-        std::cout << "+++ " << mats.size() << std::endl;
+        std::cout << "Before removing duplicates:" << mats.size() << std::endl;
 
         std::sort( mats.begin(), mats.end(), mat_compare );
         mats.erase( std::unique( mats.begin(), mats.end() ), mats.end() );
@@ -129,12 +129,10 @@ int main (int argc, char **argv)
 
         for (size_t i = 0; i < mats.size(); ++i)
         {
+            print_matrix(mats[i]);
             prepend_identity(mats[i], n_bits);
 
             std::map<size_t, size_t> freq_table = sig_table(mats[i]);
-
-            print_matrix(mats[i]);
-            // print_matrix(basis_span(mats[i]));
 
             for (std::map<size_t, size_t>::iterator i=freq_table.begin();
                                                     i != freq_table.end();
@@ -142,54 +140,7 @@ int main (int argc, char **argv)
             {
                 std::cout << (*i).first << ":" << (*i).second << "\t";
             }
-            std::cout << std::endl;
-        }
 
-        std::cout << "Time to run: "
-                  << double( clock() - startTime ) / (double)CLOCKS_PER_SEC
-                  << " seconds." << std::endl;
-////////////////////////////////////////////////////////////////////////////////
-        std::cout << "+-+-+-+ Via Direct Product +-+-+-+" << std::endl;
-
-        // std::vector<matrix> products;
-        // for (size_t tl_dimn = 1; tl_dimn <= (n_bits / 2); ++tl_dimn)
-        // {
-        //     std::vector<matrix> mats1 = all(tl_dimn, false);
-        //     std::vector<matrix> mats2 = all(n_bits - tl_dimn, false);
-
-
-        //     for (size_t i = 0; i < mats1.size(); ++i)
-        //     {
-        //         for (size_t j = 0; j < mats2.size(); ++j)
-        //         {
-        //             products.push_back(semi_direct_product(mats1[i],mats2[j], n_bits - tl_dimn));
-        //         }
-        //     }
-        // }
-        std::vector<matrix> products = all_divide_and_conquer(n_bits);
-
-
-        std::cout << "+++ " << products.size() << std::endl;
-        std::sort( products.begin(), products.end(), mat_compare );
-        products.erase( std::unique( products.begin(), products.end() ), products.end() );
-        std::cout << "Found " << products.size() << " " << n_bits << "-by-" << n_bits
-                  << " orthognal matrices over F2" << std::endl;
-
-       for (size_t i = 0; i < products.size(); ++i)
-        {
-            prepend_identity(products[i], n_bits);
-
-            std::map<size_t, size_t> freq_table_prod = sig_table(products[i]);
-
-            print_matrix(products[i]);
-            // print_matrix(basis_span(mats[i]));
-
-            for (std::map<size_t, size_t>::iterator i=freq_table_prod.begin();
-                                                    i != freq_table_prod.end();
-                                                    ++i)
-            {
-                std::cout << (*i).first << ":" << (*i).second << "\t";
-            }
             std::cout << std::endl;
         }
 
