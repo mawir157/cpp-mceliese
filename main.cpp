@@ -160,7 +160,7 @@ int main (int argc, char **argv)
         SaveKeys(priv, pub, ".");
 
         LinearCode   G =  std::get<1>(priv);
-        G.print();
+        // G.print();
 
         return 0;
     }
