@@ -17,5 +17,5 @@ then
 	cat decoded.txt
   echo $DIFF
 else
-	echo "Completed encryption/decrptyion circuit with no errors. :)"
+  echo "Completed encryption/decrptyion circuit with no errors. :)"
 fi
