@@ -140,7 +140,9 @@ McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits)
     LinearCode G = LinearCode(bs, bits);
     const uint64_t width = words + bits;
 
-    permn P = RandomPermutation(width, 8 * width + 1);
+    // It looks like we need ~n^2 swaps to get a 'random' element of Sn
+    // https://cstheory.stackexchange.com/questions/5321/
+    permn P = RandomPermutation(width, width * width);
 
     McEliesePrivate PriKey = {C, G, P};
 

@@ -86,6 +86,33 @@ matrix transpose(const matrix& m, const size_t n_bits)
     std::reverse(tp.begin(), tp.end());
     return tp;
 }
+// A * B
+matrix multiply(const matrix& A, const size_t bitsA,
+                const matrix& B, const size_t bitsB)
+{
+    matrix product(B.size());
+
+    if (bitsA != B.size())
+        std::cout << "All bets are off, we are going to seg-fault!";
+
+    matrix B_trans = transpose(B, bitsB);
+    std::reverse(B_trans.begin(), B_trans.end());
+    matrix A_rev = A;
+    std::reverse(A_rev.begin(), A_rev.end());
+
+    for (size_t r = 0; r < A_rev.size(); ++r)
+    {
+        for (size_t c = 0; c < B_trans.size(); ++c)
+        {
+            size_t dot = row_dot(A_rev[r], B_trans[c]);
+            if (1 == dot)
+                product[r].set(c);
+        }
+    }
+    std::reverse(product.begin(), product.end());
+
+    return product;
+}
 
 void print_codeword(code_word r, const bool new_line)
 {
