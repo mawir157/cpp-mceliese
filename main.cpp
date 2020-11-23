@@ -118,6 +118,18 @@ int main (int argc, char **argv)
 
         clock_t startTime = clock();
 
+        for (size_t i = 0; i < 100; ++i)
+        {
+            const matrix M = find(n_bits);
+            // print_matrix(M);
+            const matrix inv = invert(M);
+            // print_matrix(inv);
+            const matrix P = multiply(M, n_bits, inv, n_bits);
+            print_matrix(P);
+
+            std::cout << "===============================" << std::endl;
+        }
+
         std::vector<matrix> mats = all(n_bits, false);
         std::cout << "+++ " << mats.size() << std::endl;
 
@@ -125,14 +137,6 @@ int main (int argc, char **argv)
         mats.erase( std::unique( mats.begin(), mats.end() ), mats.end() );
         std::cout << "Found " << mats.size() << " " << n_bits << "-by-" << n_bits
                   << " orthognal matrices over F2" << std::endl;
-
-        for (size_t i = 0; i < mats.size(); ++i)
-        {
-            const matrix id = invert(mats[i]);
-            // print_matrix(mats[i]);
-            // print_matrix(id);
-            std::cout << "==========================" << std::endl;
-        }
 
         // for (size_t i = 0; i < mats.size(); ++i)
         // {

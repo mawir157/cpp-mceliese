@@ -133,7 +133,7 @@ void PrintPermutation(const permn& ps)
 
 McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits)
 {
-    matrix C/* = find(words, words)*/;
+    matrix C = find(words);
 
     matrix bs = find(words, bits);
 
@@ -156,6 +156,7 @@ McEliesePublic PrivateToPublic(const McEliesePrivate& privKey)
     const permn  P =  std::get<2>(privKey);
 
     hackLinearComb(G, -1);
+    // G = multiply(C, n_bits, G, 64);
     applyPermn(G, P);
     return G;
 }
@@ -179,12 +180,16 @@ std::vector<code_word> McE_encypt_message(const McEliesePublic& pubKey,
 std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
                                           const std::vector<code_word>& message)
 {
+    const matrix C =  std::get<0>(privKey);
     const LinearCode G =  std::get<1>(privKey);
     const permn      P =  std::get<2>(privKey);
 
     std::vector<code_word> ms = message;
     applyPermn(ms, P, true);
     ms = G.decode_message(ms);
+
+    // const matrix C_inv = invert(C);
+
     ms = hackLinearComb(ms, G.code_word_size(), true);
 
     return ms;

@@ -61,6 +61,7 @@ void recursively_build_new(matrix rows,
 
 std::vector<matrix> all(const size_t n, const bool verbose=false);
 matrix find(const size_t n, const size_t bits);
+matrix find(const size_t n);
 std::vector<code_word> basis_span(const std::vector<code_word>& generator);
 
 std::vector<size_t> v_space_sig(const std::vector<code_word>& generator);

@@ -141,7 +141,7 @@ matrix invert(const matrix& M)
         size_t pivot = 0;
         for (size_t j = i; j < dimn; ++j)
         {
-            if (A[i][j])
+            if (A[j][i])
             {
                 pivot = j;
                 break;
@@ -153,6 +153,7 @@ matrix invert(const matrix& M)
             std::iter_swap(A.begin() + pivot,   A.begin() + i);
             std::iter_swap(id.begin() + pivot, id.begin() + i);
         }
+
         // use the pivot row cancel the ith bit of all subsequent rows
         for (size_t j = 0; j < dimn; ++j)
         {
@@ -166,12 +167,9 @@ matrix invert(const matrix& M)
             }
         }
     }
+    // put back the right way around
     std::reverse(A.begin(), A.end());
     std::reverse(id.begin(), id.end());
-
-    print_matrix(A);
-    print_matrix(id);
-
     return id;
 }
 
@@ -388,7 +386,7 @@ std::cout << "["<< block << "] *****"
     return matrices;
 }
 
-matrix find(const uint64_t n, const uint64_t bits)
+matrix find(const size_t n, const size_t bits)
 {
     matrix m;
     unsigned long long max = 1;
@@ -410,6 +408,26 @@ matrix find(const uint64_t n, const uint64_t bits)
 
         if (ok)
             m.push_back(c);
+    }
+
+    return m;
+}
+
+matrix find(const size_t n)
+{
+    matrix m = identity(n);
+
+    // do 100 loops
+    for (size_t step = 0; step < 100; ++step)
+    {
+        for (size_t row = 0; row < n; ++row)
+        {
+            size_t c = rand() % n;// do this properly later
+            while(c == row)
+                c = rand() % n;
+
+            m[row] = row_add(m[row], m[c]);
+        }
     }
 
     return m;
