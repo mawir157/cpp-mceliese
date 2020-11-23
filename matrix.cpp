@@ -86,6 +86,17 @@ matrix transpose(const matrix& m, const size_t n_bits)
     std::reverse(tp.begin(), tp.end());
     return tp;
 }
+
+matrix identity(const size_t n)
+{
+    matrix id(n); // 
+    for (size_t i = 0; i < n; ++i)
+        id[i].set(i);
+
+    std::reverse(id.begin(), id.end());
+    return id;
+}
+
 // A * B
 matrix multiply(const matrix& A, const size_t bitsA,
                 const matrix& B, const size_t bitsB)
@@ -112,6 +123,56 @@ matrix multiply(const matrix& A, const size_t bitsA,
     std::reverse(product.begin(), product.end());
 
     return product;
+}
+// we assume M is square
+matrix invert(const matrix& M)
+{
+    matrix A = M;
+    const size_t dimn = A.size();
+    matrix id = identity(dimn);
+    // we are going to do everything backwards to make the indices nicer
+    std::reverse(A.begin(), A.end());
+    std::reverse(id.begin(), id.end());
+
+    // set the ith bit
+    for (size_t i = 0; i < dimn; ++i)
+    {
+        // find the first word where the ith bit is non-zero
+        size_t pivot = 0;
+        for (size_t j = i; j < dimn; ++j)
+        {
+            if (A[i][j])
+            {
+                pivot = j;
+                break;
+            }
+        }
+        // swap the pivot row with the ith row
+        if (i != pivot)
+        {
+            std::iter_swap(A.begin() + pivot,   A.begin() + i);
+            std::iter_swap(id.begin() + pivot, id.begin() + i);
+        }
+        // use the pivot row cancel the ith bit of all subsequent rows
+        for (size_t j = 0; j < dimn; ++j)
+        {
+            if (i == j)
+                continue;
+
+            if (A[j][i])
+            {
+                A[j] = row_add(A[j],A[i]);
+                id[j] = row_add(id[j],id[i]);
+            }
+        }
+    }
+    std::reverse(A.begin(), A.end());
+    std::reverse(id.begin(), id.end());
+
+    print_matrix(A);
+    print_matrix(id);
+
+    return id;
 }
 
 void print_codeword(code_word r, const bool new_line)

@@ -45,8 +45,10 @@ bool row_order(const code_word& lhs, const code_word& rhs);
 bool row_order(const code_word& lhs, const code_word& rhs);
 matrix canonise(const matrix& cw);
 
+matrix identity(const size_t n);
 matrix multiply(const matrix& m1, const size_t bits1,
                 const matrix& m2, const size_t bits2);
+matrix invert(const matrix& M);
 
 void recursively_build(matrix rows, size_t depth, const code_word max_row,
                        std::vector<matrix>& matrices, const bool verbose=false);
