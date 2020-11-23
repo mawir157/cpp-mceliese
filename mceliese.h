@@ -13,9 +13,8 @@ void applyPermn(std::vector<code_word>& message, const permn& perm,
 	              const bool reverse=false);
 
 permn RandomPermutation(const uint64_t width, const uint64_t upto);
-void PrintPermutation(const permn& ps);
 
-code_word unscramble_symbol(const code_word ms, const matrix& C);
+code_word unscramble_symbol(const code_word& ms, const matrix& C);
 std::vector<code_word> unscramble(const std::vector<code_word>& ms,
                                   const matrix& C);
 

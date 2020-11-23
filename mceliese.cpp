@@ -1,6 +1,6 @@
 #include "mceliese.h"
 
-code_word unscramble_symbol(const code_word ms, const matrix& C)
+code_word unscramble_symbol(const code_word& ms, const matrix& C)
 {
     code_word sym = 0;
 
@@ -99,18 +99,6 @@ permn RandomPermutation(const uint64_t width, const uint64_t upto)
         ps.push_back(p);
     }
     return ps;
-}
-
-void PrintPermutation(const permn& ps)
-{
-    for (uint64_t i = 0; i < ps.size(); ++i)
-    {
-        const permUnit p = ps[i];
-        const uint64_t c1 = std::get<0>(p);
-        const uint64_t c2 = std::get<1>(p);
-        std::cout << "(" << c1 << "," << c2 << ")";
-    }
-    std::cout << std::endl;
 }
 
 McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits)

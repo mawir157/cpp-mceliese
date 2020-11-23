@@ -1,13 +1,13 @@
 make -B
-echo "Compilation OK!"
+echo "Compilation    OK!"
 rm -f cipher.txt
 rm -f decoded.txt
 ./mceliese -g 8 48
 echo "Key generation OK!"
 ./mceliese -e test.txt public.mce >> cipher.txt
-echo "Encryption OK!"
+echo "Encryption     OK!"
 ./mceliese -d cipher.txt private.mce >> decoded.txt
-echo "Decryption OK!"
+echo "Decryption     OK!"
 
 DIFF=$(diff test.txt decoded.txt) 
 if [ "$DIFF" != "" ] 

@@ -118,18 +118,6 @@ int main (int argc, char **argv)
 
         clock_t startTime = clock();
 
-        for (size_t i = 0; i < 100; ++i)
-        {
-            const matrix M = find(n_bits);
-            // print_matrix(M);
-            const matrix inv = invert(M);
-            // print_matrix(inv);
-            const matrix P = multiply(M, n_bits, inv, n_bits);
-            print_matrix(P);
-
-            std::cout << "===============================" << std::endl;
-        }
-
         std::vector<matrix> mats = all(n_bits, false);
         std::cout << "+++ " << mats.size() << std::endl;
 
@@ -138,22 +126,22 @@ int main (int argc, char **argv)
         std::cout << "Found " << mats.size() << " " << n_bits << "-by-" << n_bits
                   << " orthognal matrices over F2" << std::endl;
 
-        // for (size_t i = 0; i < mats.size(); ++i)
-        // {
-        //     prepend_identity(mats[i], n_bits);
+        for (size_t i = 0; i < mats.size(); ++i)
+        {
+            prepend_identity(mats[i], n_bits);
 
-        //     std::map<size_t, size_t> freq_table = sig_table(mats[i]);
+            std::map<size_t, size_t> freq_table = sig_table(mats[i]);
 
-        //     print_matrix(basis_span(mats[i]));
+            print_matrix(basis_span(mats[i]));
 
-        //     for (std::map<size_t, size_t>::iterator i=freq_table.begin();
-        //                                             i != freq_table.end();
-        //                                             ++i)
-        //     {
-        //         std::cout << (*i).first << ":" << (*i).second << "\t";
-        //     }
-        //     std::cout << std::endl;
-        // }
+            for (std::map<size_t, size_t>::iterator i=freq_table.begin();
+                                                    i != freq_table.end();
+                                                    ++i)
+            {
+                std::cout << (*i).first << ":" << (*i).second << "\t";
+            }
+            std::cout << std::endl;
+        }
 
         std::cout << "Time to run: "
                   << double( clock() - startTime ) / (double)CLOCKS_PER_SEC

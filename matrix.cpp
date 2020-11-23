@@ -12,62 +12,19 @@ inline bool operator==(const matrix& lhs, const matrix& rhs)
     return true;
 }
 
-size_t row_dot(const code_word r1, const code_word r2)
+size_t row_dot(const code_word& r1, const code_word& r2)
 {
     return row_weight(r1 & r2) % 2;
 }
 
-code_word row_add(const code_word r1, const code_word r2)
+code_word row_add(const code_word& r1, const code_word& r2)
 {
     return (r1 ^ r2);
-}
-
-size_t col_weight(const matrix& rows, const size_t c1)
-{
-    size_t total = 0;
-    for (size_t i=0; i < rows.size(); ++i)
-        total += (rows[i][c1] ? 1 : 0);
-
-    return total;
-}
-
-std::vector<size_t> column_weights(const matrix& rows, const size_t n_bits)
-{
-    std::vector<size_t> cols(n_bits);
-
-    for (size_t i=0; i < rows.size(); ++i)
-    {
-        for (size_t j=0; j < n_bits; ++j)
-        {
-            cols[j] += (rows[i][j] ? 1 : 0);
-        }
-    }
-    return cols;
-}
-
-bool col_weight_acc(const matrix& rows, const size_t n_bits)
-{
-    const matrix trs = transpose(rows, n_bits);
-
-    for (size_t i = 1; i < trs.size(); ++i)
-        if (row_weight(trs[i-1]) < row_weight(trs[i]))
-            return false;
-
-    return true;
 }
 
 size_t row_weight(const code_word& r)
 {
     return r.count();
-}
-
-bool row_weight_dec(const matrix& rows)
-{
-    for (size_t i = 1; i < rows.size(); ++i)
-        if (row_weight(rows[i-1]) > row_weight(rows[i]))
-            return false;
-
-    return true;
 }
 
 matrix transpose(const matrix& m, const size_t n_bits)
@@ -173,7 +130,7 @@ matrix invert(const matrix& M)
     return id;
 }
 
-void print_codeword(code_word r, const bool new_line)
+void print_codeword(const code_word& r, const bool new_line)
 {
     std::cout << r;
 
@@ -183,7 +140,7 @@ void print_codeword(code_word r, const bool new_line)
     return;
 }
 
-void print_matrix(const matrix rows)
+void print_matrix(const matrix& rows)
 {
     for (size_t i = 0; i < rows.size(); ++i)
         print_codeword(rows[i]);
@@ -193,7 +150,7 @@ void print_matrix(const matrix rows)
     return;
 }
 
-code_word swap_bits(const code_word r, const size_t c1, const size_t c2)
+code_word swap_bits(const code_word& r, const size_t c1, const size_t c2)
 {
     const code_word b1 = (r[c1] ? 1 : 0);
     const code_word b2 = (r[c2] ? 1 : 0);
@@ -203,7 +160,7 @@ code_word swap_bits(const code_word r, const size_t c1, const size_t c2)
     return (r ^ x);
 }
 
-code_word reverse(const code_word r, const size_t width)
+code_word reverse(const code_word& r, const size_t width)
 {
     code_word p = 0;
     for (size_t i = 0; i < width; ++i)
@@ -222,7 +179,7 @@ void swap_columns(matrix& m, const size_t c1, const size_t c2)
     return;
 }
 
-code_word vec_to_code_word(const std::vector<size_t> v)
+code_word vec_to_code_word(const std::vector<size_t>& v)
 {
     code_word cw = 0;
     for (size_t i = 0; i < v.size(); ++i)
@@ -257,7 +214,7 @@ matrix canonise(const matrix& cw)
 
 void recursively_build(matrix rows,
                        size_t depth,
-                       const code_word max_row,
+                       const code_word& max_row,
                        std::vector<matrix>& matrices,
                        const bool verbose)
 {
@@ -299,7 +256,7 @@ void recursively_build(matrix rows,
 void recursively_build_new(matrix rows,
                            size_t depth,
                            const size_t cur_index,
-                           const std::vector<code_word> odd_words,
+                           const std::vector<code_word>& odd_words,
                            std::vector<matrix>& matrices,
                            const bool verbose)
 {

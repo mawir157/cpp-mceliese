@@ -25,14 +25,10 @@ class LinearCode
 
 		// swap function
 		void swapColumns(const size_t c1, const size_t c2);
-		void replaceRow(const size_t r, const code_word wd);
 
 		// [en/de]-crypting
 		std::vector<code_word> encode_message(const std::vector<code_word>& message) const;
 		std::vector<code_word> decode_message(const std::vector<code_word>& message) const;
-
-		// printing code
-		void print() const;
 	
 	private:
 		matrix mv_generator;
@@ -43,8 +39,8 @@ class LinearCode
 		bool mb_can_decode; // flag gets set to to false during building public key
 
 		// [en/de]-crypting
-		code_word encode_symbol(const code_word r) const;
-		code_word decode_symbol(const code_word r) const;
+		code_word encode_symbol(const code_word& r) const;
+		code_word decode_symbol(const code_word& r) const;
 
 		size_t calc_minimum_weight() const;
 };
