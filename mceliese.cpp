@@ -1,46 +1,28 @@
 #include "mceliese.h"
 
-// doing this properly is v difficult I will come back a do properly later
-std::vector<code_word> hackLinearComb(const std::vector<code_word>& M,
-                                      const size_t bits, const bool rev)
+code_word unscramble_symbol(const code_word ms, const matrix& C)
 {
-    matrix scrambled;
+    code_word sym = 0;
 
-    if (!rev)
+    matrix C_trans = transpose(C, C.size());
+
+    for (size_t i = 0; i < C_trans.size(); ++i)
     {
-        scrambled.push_back(M[0]);
-        for (size_t i = 1; i < M.size(); ++i)
-            scrambled.push_back(row_add(M[i-1], M[i]));
+        size_t b = row_dot(C_trans[i], ms);
+        sym.set(i, 1 == b);
     }
-    else
-    {
-        for (size_t i = 0; i < M.size(); ++i)
-        {
-            code_word cipher = M[i];
-            bool temp = cipher[0];
-            code_word plain = (temp ? 1 : 0);
-
-            for (size_t j = 1; j < bits; ++j)
-            {
-                plain <<= 1;
-                temp ^= cipher[j];
-                plain |= (temp ? 1 : 0);
-            }
-
-            plain = reverse(plain, bits);
-            scrambled.push_back(plain);
-        }
-    }
-    return scrambled;
+    sym = reverse(sym, C.size());
+    return sym;
 }
 
-void hackLinearComb(LinearCode& lc, const bool rev)
+std::vector<code_word> unscramble(const std::vector<code_word>& ms,
+                                  const matrix& C)
 {
-    matrix scrambled = hackLinearComb(lc.get_gen_mat(), rev);
-    for (size_t i = 0; i < scrambled.size(); ++i)
-        lc.replaceRow(i, scrambled[i]);
+    std::vector<code_word> uns;
+    for (size_t i = 0; i < ms.size(); ++i)
+        uns.push_back(unscramble_symbol(ms[i], C));
 
-    return;
+    return uns;
 }
 
 void applySwap(LinearCode& lc, const permUnit& swp)
@@ -155,8 +137,9 @@ McEliesePublic PrivateToPublic(const McEliesePrivate& privKey)
     LinearCode   G =  std::get<1>(privKey);
     const permn  P =  std::get<2>(privKey);
 
-    hackLinearComb(G, -1);
-    // G = multiply(C, n_bits, G, 64);
+    matrix G_mat = G.get_gen_mat();
+    G_mat = multiply(C, C.size(), G_mat, 64);
+    G.set_generator(G_mat);
     applyPermn(G, P);
     return G;
 }
@@ -180,7 +163,7 @@ std::vector<code_word> McE_encypt_message(const McEliesePublic& pubKey,
 std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
                                           const std::vector<code_word>& message)
 {
-    const matrix C =  std::get<0>(privKey);
+    const matrix     C =  std::get<0>(privKey);
     const LinearCode G =  std::get<1>(privKey);
     const permn      P =  std::get<2>(privKey);
 
@@ -188,9 +171,8 @@ std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
     applyPermn(ms, P, true);
     ms = G.decode_message(ms);
 
-    // const matrix C_inv = invert(C);
-
-    ms = hackLinearComb(ms, G.code_word_size(), true);
+    const matrix C_inv = invert(C);
+    ms = unscramble(ms, C_inv);
 
     return ms;
 }
@@ -224,18 +206,29 @@ void SaveKeys(const McEliesePrivate& privKey,
     std::ofstream private_file;
     private_file.open(private_key_dir, std::ofstream::out | std::ofstream::trunc);
 
+    const matrix     C =  std::get<0>(privKey);
     const LinearCode G = std::get<1>(privKey);
     const permn      P = std::get<2>(privKey);
     const matrix     M = G.get_extra_bits();
 
     private_file << G.get_code_with() << std::endl;
 
+    private_file << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+"
+                 << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;
+
+    for (size_t i = 0; i < C.size(); ++i)
+    {
+       private_file << C[i] << (i + 1 == C.size() ? "\n" : ",");
+    }
+    private_file << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+"
+                 << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;
+
     for (size_t i = 0; i < M.size(); ++i)
     {
        private_file << M[i] << (i + 1 == M.size() ? "\n" : ",");
     }
     private_file << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+"
-                << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;
+                 << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;
 
     for (size_t i = 0; i < P.size(); ++i)
     {
@@ -262,9 +255,26 @@ McEliesePrivate ReadPrivateKey(const std::string& file_path)
     getline(data_file, line);
     w = std::stoi(line.substr(0, 10));
 
+    getline(data_file, line); // skip line
     getline(data_file, line);
+    ////////////////////////////////////////////////////////////////////////////
     int from = 0;
     int comma = line.find(",", from);
+
+    C.emplace_back(line.substr(from, comma - from));
+    while (comma > 0)
+    {
+        from = comma + 1;
+        comma = line.find(",", from);
+
+        C.emplace_back(line.substr(from, comma - from));
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    getline(data_file, line); // skip line
+    getline(data_file, line);
+
+    from = 0;
+    comma = line.find(",", from);
 
     G.emplace_back(line.substr(from, comma - from));
     while (comma > 0)
@@ -274,7 +284,7 @@ McEliesePrivate ReadPrivateKey(const std::string& file_path)
 
         G.emplace_back(line.substr(from, comma - from));
     }
-
+    ////////////////////////////////////////////////////////////////////////////
     LinearCode lc = LinearCode(G, w);
     getline(data_file, line); // skip line
     getline(data_file, line);

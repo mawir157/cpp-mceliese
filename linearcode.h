@@ -20,7 +20,7 @@ class LinearCode
 		// setters
 		void set_decode_flag(const bool b) { mb_can_decode = b; }
 		void set_generator(const matrix& M) { mv_generator = M;
-			                                  mb_can_decode = false; }
+			                                    mb_can_decode = false; }
 		void set_max_errors(const size_t n) { mn_max_errors = n ; }
 
 		// swap function
