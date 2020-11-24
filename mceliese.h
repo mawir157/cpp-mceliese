@@ -1,18 +1,17 @@
 #include "linearcode.h"
 
-typedef std::tuple<size_t, size_t> permUnit;
-typedef std::vector<permUnit> permn;
+typedef std::vector<size_t> permn;
 typedef std::tuple<matrix, LinearCode, permn> McEliesePrivate;
 typedef LinearCode McEliesePublic;
 
-void applySwap(LinearCode& lc, const permUnit& swp);
-void applyPermn(LinearCode& lc, const permn& perm, const bool reverse=false);
+code_word applyPermutation(const code_word& cw,
+                           const std::vector<size_t>& perm,
+                           const bool rev);
+std::vector<code_word> applyPermutation(const std::vector<code_word>& message,
+                                        const std::vector<size_t>& perm,
+                                        const bool rev);
 
-void applySwap(code_word& message, const permn& perm);
-void applyPermn(std::vector<code_word>& message, const permn& perm,
-	              const bool reverse=false);
-
-permn RandomPermutation(const uint64_t width, const uint64_t upto);
+permn random_permutation(const uint64_t width);
 
 code_word unscramble_symbol(const code_word& ms, const matrix& C);
 std::vector<code_word> unscramble(const std::vector<code_word>& ms,

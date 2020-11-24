@@ -118,6 +118,15 @@ int main (int argc, char **argv)
 
         clock_t startTime = clock();
 
+        std::vector<size_t> digits;
+        for (size_t i = 0; i <  10; ++i)
+            digits.push_back(i);
+
+        std::random_shuffle(digits.begin(), digits.end());
+
+        for (size_t i = 0; i < digits.size(); ++i)
+            std::cout << digits[i] << ((i+1 != digits.size()) ? "," : "\n");
+
         std::vector<matrix> mats = all(n_bits, false);
         std::cout << "+++ " << mats.size() << std::endl;
 
@@ -174,6 +183,8 @@ int main (int argc, char **argv)
 
         for (size_t i = 0; i < ciphertext.size(); ++i)
             std::cout << ciphertext[i] << (i + 1 == ciphertext.size() ? "\n" : ",");
+
+        return 0;
     }
 
     if (RunMode::decode_message == mode)
@@ -185,7 +196,9 @@ int main (int argc, char **argv)
 
         for (size_t i = 0; i < plaintext.size(); ++i)
             std::cout << plaintext[i].to_ullong() << (i + 1 == plaintext.size() ? "\n" : ",");
+
+        return 0;
     }
 
-    return 0;
+    return -1;
 }

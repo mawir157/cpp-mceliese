@@ -25,80 +25,47 @@ std::vector<code_word> unscramble(const std::vector<code_word>& ms,
     return uns;
 }
 
-void applySwap(LinearCode& lc, const permUnit& swp)
+code_word applyPermutation(const code_word& cw,
+                           const std::vector<size_t>& perm,
+                           const bool rev)
 {
-    const uint64_t c1 = std::get<0>(swp);
-    const uint64_t c2 = std::get<1>(swp);
-
-    lc.swapColumns(c1, c2);
-
-    return;
-}
-
-void applySwap(code_word& message, const permn& perm)
-{
-
-}
-
-void applyPermn(LinearCode& lc, const permn& perm, const bool rev)
-{
+    //permutation looks like
+    // 0123456789
+    // 2435019867
+    code_word permutated;
     if (rev)
     {
-        for (uint64_t i = perm.size(); i > 0; --i)
-            applySwap(lc, perm[i-1]);
+        for (size_t i = 0; i < perm.size(); ++i)
+            permutated.set(perm[i], cw[i]);
     }
     else
     {
-        for (uint64_t i = 0; i < perm.size(); ++i)
-            applySwap(lc, perm[i]);
-    }
-
-    lc.set_decode_flag(false);
-
-    return;
+        for (size_t i = 0; i < perm.size(); ++i)
+            permutated.set(i, cw[perm[i]]);
+    } 
+    return permutated; 
 }
 
-void applyPermn(std::vector<code_word>& message, const permn& ps,
-                const bool rev)
+std::vector<code_word> applyPermutation(const std::vector<code_word>& message,
+                                        const std::vector<size_t>& perm,
+                                        const bool rev)
 {
-    if (rev)
-    {
-        for (uint64_t i = ps.size(); i > 0; --i)
-        {
-            const permUnit swp = ps[i-1];
-            const uint64_t c1 = std::get<0>(swp);
-            const uint64_t c2 = std::get<1>(swp);
-            swap_columns(message, c1, c2);
-        }
-    }
-    else
-    {
-        for (uint64_t i = 0; i < ps.size(); ++i)
-        {
-            const permUnit swp = ps[i];
-            const uint64_t c1 = std::get<0>(swp);
-            const uint64_t c2 = std::get<1>(swp);
-            swap_columns(message, c1, c2);
-        }
-    }
-    return;
+    std::vector<code_word> permutated;
+    for (size_t i = 0; i < message.size(); ++i)
+        permutated.push_back(applyPermutation(message[i], perm, rev));
+
+    return permutated;
 }
 
-permn RandomPermutation(const uint64_t width, const uint64_t upto)
+permn random_permutation(const uint64_t width)
 {
-    permn ps;
-    while (ps.size() < upto)
-    {
-        const uint64_t c1 = rand() % width;
-        const uint64_t c2 = rand() % width;
+    std::vector<size_t> digits;
+    for (size_t i = 0; i <  width; ++i)
+        digits.push_back(i);
 
-        if (c1 == c2)
-            continue;
+    std::random_shuffle(digits.begin(), digits.end());
 
-        permUnit p(c1,c2);
-        ps.push_back(p);
-    }
-    return ps;
+    return digits;
 }
 
 McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits)
@@ -110,9 +77,7 @@ McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits)
     LinearCode G = LinearCode(bs, bits);
     const uint64_t width = words + bits;
 
-    // It looks like we need ~n^2 swaps to get a 'random' element of Sn
-    // https://cstheory.stackexchange.com/questions/5321/
-    permn P = RandomPermutation(width, width * width);
+    permn P = random_permutation(width);
 
     McEliesePrivate PriKey = {C, G, P};
 
@@ -127,8 +92,8 @@ McEliesePublic PrivateToPublic(const McEliesePrivate& privKey)
 
     matrix G_mat = G.get_gen_mat();
     G_mat = multiply(C, C.size(), G_mat, 64);
+    G_mat = applyPermutation(G_mat, P, false);
     G.set_generator(G_mat);
-    applyPermn(G, P);
     return G;
 }
 
@@ -156,7 +121,7 @@ std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
     const permn      P =  std::get<2>(privKey);
 
     std::vector<code_word> ms = message;
-    applyPermn(ms, P, true);
+    ms = applyPermutation(ms, P, true);
     ms = G.decode_message(ms);
 
     const matrix C_inv = invert(C);
@@ -219,13 +184,7 @@ void SaveKeys(const McEliesePrivate& privKey,
                  << "|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|+|" << std::endl;
 
     for (size_t i = 0; i < P.size(); ++i)
-    {
-        const uint64_t c1 = std::get<0>(P[i]);
-        const uint64_t c2 = std::get<1>(P[i]);
-
-        private_file << c1 << "|" << c2
-                    << (i + 1 == P.size() ? "\n" : ",");
-    }
+        private_file << P[i] << ((i + 1 == P.size()) ? "\n" : ",");
 
     private_file.close();
 }
@@ -277,26 +236,16 @@ McEliesePrivate ReadPrivateKey(const std::string& file_path)
     getline(data_file, line); // skip line
     getline(data_file, line);
 
-    from    = 0;
-    int bar = line.find("|", from);
-    comma   = line.find(",", from);
-    int value1, value2;
+    from = 0;
+    comma = line.find(",", from);
 
-    value1 = std::stoi(line.substr(from, bar - from));
-    value2 = std::stoi(line.substr(bar+1, comma - bar + 1));
-    permUnit p(value1, value2);
-    P.push_back(p);
+    P.push_back(std::stoi(line.substr(from, comma - from)));
     while (comma > 0)
     {
         from = comma + 1;
         comma = line.find(",", from);
-        bar = line.find("|", from);
 
-        value1 = std::stoi(line.substr(from, bar - from));
-        value2 = std::stoi(line.substr(bar+1, comma - bar + 1));
-
-        permUnit p(value1, value2);
-        P.push_back(p);
+        P.push_back(std::stoi(line.substr(from, comma - from)));
     }
 
     McEliesePrivate PrivateKey = {C, lc, P};
