@@ -20,16 +20,16 @@ std::vector<code_word> unscramble(const std::vector<code_word>& ms,
 McEliesePrivate GenPrivateKey(const size_t words, const size_t bits);
 McEliesePublic PrivateToPublic(const McEliesePrivate& privKey);
 void SaveKeys(const McEliesePrivate& privKey,
-	            const McEliesePublic& pubKey,
-	            const std::string& dir_path);
+              const McEliesePublic& pubKey,
+              const std::string& dir_path);
 
 McEliesePrivate ReadPrivateKey(const std::string& file_path);
 McEliesePublic ReadPublicKey(const std::string& file_path);
 std::vector<code_word> ReadCSV(const std::string& file_path,
-	                             const bool bin=false);
+                               const bool bin=false);
 
 std::vector<code_word> McE_encypt_message(const McEliesePublic& pubKey,
                                           const std::vector<code_word>& message);
 
 std::vector<code_word> McE_decypt_message(const McEliesePrivate& privKey,
-	                                        const std::vector<code_word>& message);
+                                          const std::vector<code_word>& message);
