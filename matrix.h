@@ -2,11 +2,12 @@
 
 #include "includes.h"
 
-static const size_t BITS = 64;
+static const size_t BITS = 128;
 typedef std::bitset<BITS> code_word;
 static const code_word BS0 = 0;
 
 void increment_codeword(code_word& cw);
+void decrement_codeword(code_word& cw);
 bool gt_codeword(const code_word &b1, const code_word &b2);
 
 // needed for the syndrome table;
@@ -50,14 +51,12 @@ matrix multiply(const matrix& m1, const size_t bits1,
                 const matrix& m2, const size_t bits2);
 matrix invert(const matrix& M);
 
-void recursively_build(matrix rows, size_t depth, const code_word& max_row,
-                       std::vector<matrix>& matrices, const bool verbose=false);
-void recursively_build_new(matrix rows,
-                           size_t depth,
-                           const size_t cur_index,
-                           const std::vector<code_word>& odd_words,
-                           std::vector<matrix>& matrices,
-                           const bool verbose=false);
+void recursively_build(matrix rows,
+                       size_t depth,
+                       const size_t cur_index,
+                       const std::vector<code_word>& odd_words,
+                       std::vector<matrix>& matrices,
+                       const bool verbose=false);
 
 std::vector<matrix> all(const size_t n, const bool verbose=false);
 matrix find(const size_t n, const size_t bits);

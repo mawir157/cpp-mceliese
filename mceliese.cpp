@@ -57,7 +57,7 @@ std::vector<code_word> applyPermutation(const std::vector<code_word>& message,
     return permutated;
 }
 
-permn random_permutation(const uint64_t width)
+permn random_permutation(const size_t width)
 {
     std::vector<size_t> digits;
     for (size_t i = 0; i <  width; ++i)
@@ -68,14 +68,14 @@ permn random_permutation(const uint64_t width)
     return digits;
 }
 
-McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits)
+McEliesePrivate GenPrivateKey(const size_t words, const size_t bits)
 {
     matrix C = find(words);
 
     matrix bs = find(words, bits);
 
     LinearCode G = LinearCode(bs, bits);
-    const uint64_t width = words + bits;
+    const size_t width = words + bits;
 
     permn P = random_permutation(width);
 
@@ -91,7 +91,8 @@ McEliesePublic PrivateToPublic(const McEliesePrivate& privKey)
     const permn  P =  std::get<2>(privKey);
 
     matrix G_mat = G.get_gen_mat();
-    G_mat = multiply(C, C.size(), G_mat, 64);
+    G_mat = multiply(C,     C.size(),
+                     G_mat, G.get_code_with() + G.code_word_size());
     G_mat = applyPermutation(G_mat, P, false);
     G.set_generator(G_mat);
     return G;

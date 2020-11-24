@@ -56,14 +56,14 @@ syndrome_table build_syn_table(const matrix& check_matrix,
     return s_table;
 }
 
-code_word add_upto_n_error(const code_word& wd, const uint64_t width,
-                           const uint64_t n = 1)
+code_word add_upto_n_error(const code_word& wd, const size_t width,
+                           const size_t n = 1)
 {
     code_word new_word = wd;
-    for (uint64_t i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i)
     {
-        const uint64_t pos = rand() % width;
-        new_word.flip(pos);
+        // const size_t pos = rand() % width;
+        new_word.flip(rand() % width);
     }
     return new_word;
 }

@@ -11,13 +11,13 @@ std::vector<code_word> applyPermutation(const std::vector<code_word>& message,
                                         const std::vector<size_t>& perm,
                                         const bool rev);
 
-permn random_permutation(const uint64_t width);
+permn random_permutation(const size_t width);
 
 code_word unscramble_symbol(const code_word& ms, const matrix& C);
 std::vector<code_word> unscramble(const std::vector<code_word>& ms,
                                   const matrix& C);
 
-McEliesePrivate GenPrivateKey(const uint64_t words, const uint64_t bits);
+McEliesePrivate GenPrivateKey(const size_t words, const size_t bits);
 McEliesePublic PrivateToPublic(const McEliesePrivate& privKey);
 void SaveKeys(const McEliesePrivate& privKey,
 	            const McEliesePublic& pubKey,

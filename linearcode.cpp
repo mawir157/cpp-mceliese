@@ -73,17 +73,21 @@ std::vector<code_word> LinearCode::decode_message(const std::vector<code_word>& 
 
 size_t LinearCode::calc_minimum_weight() const
 {
-    unsigned long long max_word = 1;
-    max_word <<= code_word_size();
+    code_word max_word;
+    for (size_t i = 0; i < code_word_size(); ++i)
+        max_word.set(i);
+
     size_t min_wt = 1000;
-    for (unsigned long long wi = 1; wi < max_word; ++wi)
+    code_word wi = 1;
+    while (gt_codeword(wi, max_word))
     {
-        const code_word wd = wi;
-        const code_word test = encode_symbol(wd);
+        const code_word test = encode_symbol(wi);
         const size_t test_wt = row_weight(test);
 
         if (test_wt < min_wt)
             min_wt = test_wt;
+
+        increment_codeword(wi);
     }
 
     return min_wt;
@@ -92,9 +96,9 @@ size_t LinearCode::calc_minimum_weight() const
 matrix LinearCode::get_extra_bits() const
 {
     matrix x_bits;
-    unsigned long long mask = 1;
-    mask <<= mn_code_width;
-    mask -= 1;
+    code_word mask;
+    for (size_t i = 0; i < mn_code_width +  mv_generator.size(); ++i)
+        mask.set(i);
 
     code_word cw_mask = mask;
     for (size_t i = 0; i < mv_generator.size(); ++i)

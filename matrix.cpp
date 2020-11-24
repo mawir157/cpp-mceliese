@@ -6,6 +6,17 @@ void increment_codeword(code_word& cw)
     {
         const bool b = cw[i];
         cw.flip(i);
+        if (!b)
+            break;
+    }
+}
+
+void decrement_codeword(code_word& cw)
+{
+    for (size_t i = 0; i < BITS; ++i)
+    {
+        const bool b = cw[i];
+        cw.flip(i);
         if (b)
             break;
     }
@@ -206,51 +217,10 @@ matrix canonise(const matrix& cw)
 
 void recursively_build(matrix rows,
                        size_t depth,
-                       const code_word& max_row,
+                       const size_t cur_index,
+                       const std::vector<code_word>& odd_words,
                        std::vector<matrix>& matrices,
                        const bool verbose)
-{
-    if (depth == 0)
-    {
-        rows = canonise(rows);
-        if (verbose)
-            print_matrix(rows);
-        matrices.push_back(rows);
-        return;
-    }
-
-    for (unsigned long long ri = rows.back().to_ullong() - 1; ri > 0; --ri)
-    {
-        code_word rw = ri;
-        if (0 == (row_weight(rw) & 1))
-            continue;
-
-        bool ok = true;
-        for (uint64_t i = 0; i < rows.size(); ++i)
-        {
-            if (1 == row_dot(rows[i], rw))
-            {
-                ok = false;
-                break;
-            }
-        }
-
-        if (ok)
-        {
-            matrix r_copy = rows;
-            r_copy.push_back(rw);
-            recursively_build(r_copy, depth - 1, max_row, matrices, verbose);
-        }
-    }
-    return;
-}
-
-void recursively_build_new(matrix rows,
-                           size_t depth,
-                           const size_t cur_index,
-                           const std::vector<code_word>& odd_words,
-                           std::vector<matrix>& matrices,
-                           const bool verbose)
 {
     if (depth == 0)
     {
@@ -271,7 +241,7 @@ void recursively_build_new(matrix rows,
 
         if (ok)
         {
-            for (uint64_t j = 0; j < rows.size(); ++j)
+            for (size_t j = 0; j < rows.size(); ++j)
             {
                 if (1 == row_dot(rows[j], rw))
                 {
@@ -285,14 +255,14 @@ void recursively_build_new(matrix rows,
         {
             matrix r_copy = rows;
             r_copy.push_back(rw);
-            recursively_build_new(r_copy, depth - 1, i, odd_words,
-                                  matrices, verbose);
+            recursively_build(r_copy, depth - 1, i, odd_words,
+                              matrices, verbose);
         }
     }
     return;
 }
 
-std::vector<matrix> all(const uint64_t n, const bool verbose)
+std::vector<matrix> all(const size_t n, const bool verbose)
 {
     std::vector<matrix> matrices;
     std::vector<size_t> breaks;
@@ -318,8 +288,8 @@ clock_t startTime = clock();
             std::cout << std::endl;
         }
 
-        recursively_build_new(row_1, n - 1, breaks[block], odd_words,
-                              matrices, verbose);
+        recursively_build(row_1, n - 1, breaks[block], odd_words,
+                          matrices, verbose);
 
         // shift up by 2 bits then set the new bits to 1.
         first <<= 2;
@@ -346,7 +316,7 @@ matrix find(const size_t n, const size_t bits)
         const code_word c = rand() % max;
         bool ok = true;
 
-        for (uint64_t i = 0; i < m.size(); ++i)
+        for (size_t i = 0; i < m.size(); ++i)
         {
             if (1 == row_dot(m[i], c))
             {
@@ -390,7 +360,7 @@ std::vector<code_word> basis_span(const std::vector<code_word>& generator)
     for (unsigned long long i = 0; i < max; ++i)
     {
         code_word comb = 0;
-        const std::bitset<64> indices = i;
+        const code_word indices = i;
         for (size_t j = 0; j < generator.size(); ++j)
         {
             bool f = indices[j];

@@ -11,5 +11,5 @@ syndrome_table build_syn_table(const matrix& l_code,
 															 const size_t width,
                                const size_t max_errors);
 
-code_word add_upto_n_error(const code_word& wd, const uint64_t width,
-                           const uint64_t n);
+code_word add_upto_n_error(const code_word& wd, const size_t width,
+                           const size_t n);
