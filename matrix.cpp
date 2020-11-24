@@ -1,5 +1,27 @@
 #include "matrix.h"
 
+void increment_codeword(code_word& cw)
+{
+    for (size_t i = 0; i < BITS; ++i)
+    {
+        const bool b = cw[i];
+        cw.flip(i);
+        if (b)
+            break;
+    }
+}
+
+bool gt_codeword(const code_word &b1, const code_word &b2)
+{
+    for (size_t i = 0; i < BITS; ++i)
+    {
+         // if most significant bits differ
+        if (b1[BITS - 1 - i] ^ b2[BITS - 1 - i])
+            return b2[BITS - 1 - i];
+    }
+    return false;
+}
+
 size_t row_dot(const code_word& r1, const code_word& r2)
 {
     return row_weight(r1 & r2) % 2;
@@ -163,7 +185,7 @@ bool row_order(const code_word& lhs, const code_word& rhs)
     if (row_weight(lhs) != row_weight(rhs))
         return row_weight(lhs) < row_weight(rhs);
 
-    return lhs.to_ullong() > rhs.to_ullong();
+    return gt_codeword(rhs, lhs);
 }
 
 matrix canonise(const matrix& cw)
@@ -285,7 +307,7 @@ std::vector<matrix> all(const uint64_t n, const bool verbose)
     code_word first = 1;
 
     size_t block = 0;
-    while (first.to_ullong() + 1 < max.to_ullong())
+    while (gt_codeword(first, max))
     {
 clock_t startTime = clock();
         matrix row_1 = { first };

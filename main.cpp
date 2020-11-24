@@ -17,10 +17,10 @@ bool mat_compare(const matrix& b1, const matrix& b2)
 
         for (size_t i = 0; i < b1.size(); ++i)
         {
-            if (b1[i].to_ullong() < b2[i].to_ullong())
+            if (gt_codeword(b1[i],b2[i]))
                 return true;
 
-            if (b1[i].to_ullong() > b2[i].to_ullong())
+            if (gt_codeword(b2[i],b1[i]))
                 return false;
         }
 

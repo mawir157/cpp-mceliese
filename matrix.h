@@ -2,15 +2,25 @@
 
 #include "includes.h"
 
-typedef std::bitset<64> code_word;
+static const size_t BITS = 64;
+typedef std::bitset<BITS> code_word;
 static const code_word BS0 = 0;
-// static const code_word BS1 = 1;
+
+void increment_codeword(code_word& cw);
+bool gt_codeword(const code_word &b1, const code_word &b2);
+
 // needed for the syndrome table;
 struct Comparer
 {
     bool operator() (const code_word &b1, const code_word &b2) const
     {
-        return b1.to_ullong() < b2.to_ullong();
+        for (size_t i = 0; i < BITS; ++i)
+        {
+             // if most significant bits differ
+            if (b1[BITS - 1 - i] ^ b2[BITS - 1 - i])
+                return b2[BITS - 1 - i];
+        }
+        return false;
     }
 };
 
