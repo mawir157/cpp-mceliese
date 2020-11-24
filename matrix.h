@@ -19,8 +19,6 @@ typedef std::map<code_word, code_word, Comparer> syndrome_table;
 
 typedef std::vector<code_word> matrix;
 
-//
-inline bool operator==(const matrix& lhs, const matrix& rhs);
 size_t row_dot(const code_word& r1, const code_word& r2);
 code_word row_add(const code_word& r1, const code_word& r2);
 
@@ -31,10 +29,8 @@ matrix transpose(const matrix& m, const size_t n_bits);
 void print_codeword(const code_word& r, const bool new_line=true);
 void print_matrix(const matrix& rows);
 
-code_word swap_bits(const code_word& r, const size_t c1, const size_t c2);
 code_word vec_to_code_word(const std::vector<size_t>& v);
 code_word reverse(const code_word& r, const size_t width);
-void swap_columns(matrix& m, const size_t c1, const size_t c2);
 bool row_order(const code_word& lhs, const code_word& rhs);
 
 bool row_order(const code_word& lhs, const code_word& rhs);

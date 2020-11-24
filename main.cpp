@@ -118,15 +118,6 @@ int main (int argc, char **argv)
 
         clock_t startTime = clock();
 
-        std::vector<size_t> digits;
-        for (size_t i = 0; i <  10; ++i)
-            digits.push_back(i);
-
-        std::random_shuffle(digits.begin(), digits.end());
-
-        for (size_t i = 0; i < digits.size(); ++i)
-            std::cout << digits[i] << ((i+1 != digits.size()) ? "," : "\n");
-
         std::vector<matrix> mats = all(n_bits, false);
         std::cout << "+++ " << mats.size() << std::endl;
 
@@ -141,7 +132,7 @@ int main (int argc, char **argv)
 
             std::map<size_t, size_t> freq_table = sig_table(mats[i]);
 
-            print_matrix(basis_span(mats[i]));
+            // print_matrix(basis_span(mats[i]));
 
             for (std::map<size_t, size_t>::iterator i=freq_table.begin();
                                                     i != freq_table.end();

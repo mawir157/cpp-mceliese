@@ -24,14 +24,6 @@ LinearCode::~LinearCode()
 
 }
 
-void LinearCode::swapColumns(const size_t c1, const size_t c2)
-{
-    for (size_t j=0; j < mv_generator.size(); ++j)
-        mv_generator[j] = swap_bits(mv_generator[j], c1, c2);
-
-    return;
-}
-
 code_word LinearCode::encode_symbol(const code_word& r) const
 {
     code_word plain = reverse(r, code_word_size());

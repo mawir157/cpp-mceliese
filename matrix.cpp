@@ -1,16 +1,16 @@
 #include "matrix.h"
 
-inline bool operator==(const matrix& lhs, const matrix& rhs)
-{
-    if (lhs.size() != rhs.size())
-        return false;
+// inline bool operator==(const matrix& lhs, const matrix& rhs)
+// {
+//     if (lhs.size() != rhs.size())
+//         return false;
 
-    for (size_t i = 0; i < lhs.size(); ++i)
-        if (lhs[i] != rhs[i])
-            return false;
+//     for (size_t i = 0; i < lhs.size(); ++i)
+//         if (lhs[i] != rhs[i])
+//             return false;
 
-    return true;
-}
+//     return true;
+// }
 
 size_t row_dot(const code_word& r1, const code_word& r2)
 {
@@ -150,16 +150,6 @@ void print_matrix(const matrix& rows)
     return;
 }
 
-code_word swap_bits(const code_word& r, const size_t c1, const size_t c2)
-{
-    const code_word b1 = (r[c1] ? 1 : 0);
-    const code_word b2 = (r[c2] ? 1 : 0);
-    code_word x = (b1 ^ b2);
-    x = (x << c1) | (x << c2);
-
-    return (r ^ x);
-}
-
 code_word reverse(const code_word& r, const size_t width)
 {
     code_word p = 0;
@@ -169,14 +159,6 @@ code_word reverse(const code_word& r, const size_t width)
         p |= (r[i] ? 1 : 0);
     }
     return p;
-}
-
-void swap_columns(matrix& m, const size_t c1, const size_t c2)
-{
-    for (size_t j=0; j < m.size(); ++j)
-        m[j] = swap_bits(m[j], c1, c2);
-
-    return;
 }
 
 code_word vec_to_code_word(const std::vector<size_t>& v)

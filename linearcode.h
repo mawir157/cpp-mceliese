@@ -23,9 +23,6 @@ class LinearCode
 			                                    mb_can_decode = false; }
 		void set_max_errors(const size_t n) { mn_max_errors = n ; }
 
-		// swap function
-		void swapColumns(const size_t c1, const size_t c2);
-
 		// [en/de]-crypting
 		std::vector<code_word> encode_message(const std::vector<code_word>& message) const;
 		std::vector<code_word> decode_message(const std::vector<code_word>& message) const;
