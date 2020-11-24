@@ -1,8 +1,13 @@
 # cpp-mceliese
-boneheaded implementation of McEliese encryption in C++
+Boneheaded implementation of McEliese encryption in C++
 ## Compilation
 ```
 make
+```
+
+## Testing
+```
+./full.sh
 ```
 
 ## Generate public and private keys
@@ -13,9 +18,11 @@ where
  * `dim` is the number of bits in each plaintext symbol
  * `extra_bits` is the number of extra checksum bits to allow error correction.
       
-The encryption process will map a `dim`-bit symbol to a `dim + extra_bits` symbol.
+The encryption process will map a `dim`-bit symbol to a `dim + extra_bits`-bit symbol.
 
-Currently we impose that `dim + extra_bits < 64`.
+Currently we impose that `dim + extra_bits` < 128.
+This can be changed by altering the value of `BITS` in `matrix.h`
+(large values of `BITS` will cause memory problems when building the syndrome table).
 
 Creates two files `private.mce` and `public.mce`.
 
