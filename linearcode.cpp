@@ -29,7 +29,7 @@ code_word LinearCode::encode_symbol(const code_word& r) const
     code_word plain = reverse(r, code_word_size());
     code_word cipher = 0;
     for (size_t i = 0; i < code_word_size(); ++i, plain >>= 1)
-        if (BS1 == (plain & BS1))
+        if (plain[0])
             cipher = row_add(cipher, mv_generator[i]);
 
     return cipher;

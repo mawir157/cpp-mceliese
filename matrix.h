@@ -2,10 +2,9 @@
 
 #include "includes.h"
 
-// typedef uint64_t code_word;
 typedef std::bitset<64> code_word;
 static const code_word BS0 = 0;
-static const code_word BS1 = 1;
+// static const code_word BS1 = 1;
 // needed for the syndrome table;
 struct Comparer
 {

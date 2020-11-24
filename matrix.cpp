@@ -1,17 +1,5 @@
 #include "matrix.h"
 
-// inline bool operator==(const matrix& lhs, const matrix& rhs)
-// {
-//     if (lhs.size() != rhs.size())
-//         return false;
-
-//     for (size_t i = 0; i < lhs.size(); ++i)
-//         if (lhs[i] != rhs[i])
-//             return false;
-
-//     return true;
-// }
-
 size_t row_dot(const code_word& r1, const code_word& r2)
 {
     return row_weight(r1 & r2) % 2;
@@ -36,7 +24,7 @@ matrix transpose(const matrix& m, const size_t n_bits)
         for (size_t j = 0; j < m.size(); ++j)
         {
             wd <<= 1;
-            wd |= ((m[j] >> i) & BS1);
+            wd.set(0, m[j][i]);
         }
         tp.push_back(wd);
     }
