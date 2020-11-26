@@ -2,7 +2,7 @@
 
 #include "includes.h"
 
-static const size_t BITS = 128;
+static const size_t BITS = 64;
 typedef std::bitset<BITS> code_word;
 static const code_word BS0 = 0;
 

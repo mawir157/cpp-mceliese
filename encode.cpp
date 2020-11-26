@@ -61,9 +61,7 @@ code_word add_upto_n_error(const code_word& wd, const size_t width,
 {
     code_word new_word = wd;
     for (size_t i = 0; i < n; ++i)
-    {
-        // const size_t pos = rand() % width;
         new_word.flip(rand() % width);
-    }
+
     return new_word;
 }
