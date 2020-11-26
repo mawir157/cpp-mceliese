@@ -1,15 +1,15 @@
 if [ $# -gt 0 ]
 then
-	dim=$1
+  dim=$1
 else
-	dim=8
+  dim=8
 fi
 
 if [ $# -gt 1 ]
 then
-	extra_bits=$2
+  extra_bits=$2
 else
-	extra_bits=48
+  extra_bits=48
 fi
 
 make -B

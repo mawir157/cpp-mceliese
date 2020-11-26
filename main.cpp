@@ -3,6 +3,7 @@
 #include "encode.h"
 #include "linearcode.h"
 #include "mceliese.h"
+#include "parsetext.h"
 
 // Allow us to sort martices
 bool mat_compare(const matrix& b1, const matrix& b2)
@@ -166,7 +167,7 @@ int main (int argc, char **argv)
   if (RunMode::encode_message == mode)
   {
     McEliesePublic overt = ReadPublicKey(key_file);
-    std::vector<code_word> message = ReadCSV(message_file);
+    std::vector<code_word> message = readFile(message_file);
 
     std::vector<code_word> ciphertext = McE_encypt_message(overt, message);
 
@@ -183,8 +184,7 @@ int main (int argc, char **argv)
 
     std::vector<code_word> plaintext = McE_decypt_message(covert, message);
 
-    for (size_t i = 0; i < plaintext.size(); ++i)
-      std::cout << plaintext[i].to_ullong() << (i + 1 == plaintext.size() ? "\n" : ",");
+    std::cout << parseBackwards(plaintext);
 
     return 0;
   }
