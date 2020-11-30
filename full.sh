@@ -29,10 +29,10 @@ if [ "$DIFF" != "" ]
 then
   echo "There was an error:"
   echo "Plaintext"
-	cat test.txt
-	echo
+  cat test.txt
+  echo
   echo "Decoded text"
-	cat decoded.txt
+  cat decoded.txt
 else
   echo "Completed encryption/decryption circuit with no errors. :)"
 fi
